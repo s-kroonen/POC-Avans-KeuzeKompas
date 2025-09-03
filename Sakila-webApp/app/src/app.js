@@ -4,7 +4,12 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const routes = require('./routes');
+const expressLayouts = require('express-ejs-layouts');
+
 const app = express();
+
+app.use(expressLayouts);
+app.set('layout', 'layout'); // default layout
 // Security & perf
 app.use(helmet());
 app.use(compression());
