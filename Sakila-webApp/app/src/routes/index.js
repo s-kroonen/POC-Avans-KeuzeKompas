@@ -10,6 +10,7 @@ router.get('/films/:id', filmController.detail);
 
 
 
+const { requireLogin } = require('../middleware/auth');
 const { requireRole } = require('../middleware/auth');
 
 router.get('/admin', requireRole('admin'), (req, res) => {
@@ -19,4 +20,7 @@ router.get('/staff', requireRole('staff'), (req, res) => {
   res.send('Staff area');
 });
 
+router.get('/profile', requireLogin, (req, res) => {
+  res.render('users/profile', { user: req.session.user });
+});
 module.exports = router;

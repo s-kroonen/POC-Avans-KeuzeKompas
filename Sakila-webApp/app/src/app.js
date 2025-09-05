@@ -11,7 +11,6 @@ const authRoutes = require('./routes/auth');
 
 const app = express();
 
-// === Middleware ===
 app.use(expressLayouts);
 app.set('layout', 'layout'); // default layout
 
