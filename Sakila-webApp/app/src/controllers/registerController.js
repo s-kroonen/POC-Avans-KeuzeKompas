@@ -1,23 +1,33 @@
-const bcrypt = require('bcryptjs');
-const userRepository = require('../repositories/userRepository');
+const userService = require('../services/userService');
+const countryRepo = require('../repositories/countryRepository');
+const storeRepo = require('../repositories/storeRepository');
 
 module.exports = {
-  showRegister: (req, res) => res.render('register'),
+  showRegister: (req, res) => {
+    countryRepo.getAll((err, countries) => {
+      if (err) {
+        console.error('Country fetch failed:', err);
+        return res.render('register', { error: 'Could not load countries', countries: [], stores: [] });
+      }
+      storeRepo.getAll((err2, stores) => {
+        if (err2) {
+          console.error('Store fetch failed:', err2);
+          return res.render('register', { error: 'Could not load stores', countries, stores: [] });
+        }
+        res.render('register', { countries, stores });
+      });
+    });
+  },
 
-  register: async (req, res) => {
-    const { email, password, first_name, last_name, address, city } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
-
-    userRepository.createUser({
-      email,
-      password: hashed,
-      first_name,
-      last_name,
-      address,
-      city,
-      role: 'customer'
-    }, (err, result) => {
-      if (err) return res.send('Error creating user');
+  register: (req, res) => {
+    userService.registerCustomer(req.body, (err, result) => {
+      if (err) {
+        console.error('Register failed:', err);
+        countryRepo.getAll((err2, countries) => {
+          res.render('register', { error: err.message, countries: countries || [] });
+        });
+        return;
+      }
       res.redirect('/login');
     });
   }

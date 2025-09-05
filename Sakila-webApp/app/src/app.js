@@ -31,9 +31,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // === SESSION MUST COME BEFORE ROUTES ===
 app.use(session({
-  secret: "authsqlsakila",
-  resave: false,
-  saveUninitialized: false
+    secret: "authsqlsakila",
+    resave: false,
+    saveUninitialized: false
 }));
 
 // === ROUTES ===

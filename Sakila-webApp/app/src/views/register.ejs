@@ -1,10 +1,33 @@
 <h2>Register</h2>
-<form method="POST" action="/register">
-  <input type="text" name="first_name" placeholder="First name" required />
-  <input type="text" name="last_name" placeholder="Last name" required />
-  <input type="text" name="address" placeholder="Address" required />
-  <input type="text" name="city" placeholder="City" required />
-  <input type="email" name="email" placeholder="Email" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Register</button>
-</form>
+<% if (typeof error !=='undefined' ) { %>
+  <div class="alert alert-danger">
+    <%= error %>
+  </div>
+  <% } %>
+    <form method="POST" action="/register">
+      <input type="text" name="first_name" placeholder="First name" required />
+      <input type="text" name="last_name" placeholder="Last name" required />
+      <input type="text" name="address" placeholder="Address" required />
+      <input type="text" name="district" placeholder="District" required />
+      <input type="text" name="city" placeholder="City" required />
+      <select name="country" required>
+        <option value="">Select country</option>
+        <% countries.forEach(function(country) { %>
+          <option value="<%= country.country %>">
+            <%= country.country %>
+          </option>
+          <% }) %>
+      </select>
+      <input type="text" name="postal_code" placeholder="Postal code" />
+      <input type="text" name="phone" placeholder="Phone" />
+      <select name="store_id" required>
+        <option value="">Select store</option>
+        <% stores.forEach(function(store) { %>
+          <option value="<%= store.store_id %>">Store <%= store.store_id %>
+          </option>
+          <% }) %>
+      </select>
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Register</button>
+    </form>
