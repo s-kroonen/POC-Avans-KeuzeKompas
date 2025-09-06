@@ -3,9 +3,10 @@
   <div class="card-body">
     <h5 class="card-title mb-3"><%= user.first_name %> <%= user.last_name %></h5>
     <ul class="list-group list-group-flush">
-      <li class="list-group-item"><strong>Username:</strong> <%= user.username || user.email %></li>
+      <li class="list-group-item"><strong>Username:</strong> <%= user.first_name || user.email %></li>
       <li class="list-group-item"><strong>Email:</strong> <%= user.email %></li>
       <li class="list-group-item"><strong>Role:</strong> <%= user.role %></li>
+      <li class="list-group-item"><strong>Store ID:</strong> <%= user.store_id %></li>
       <li class="list-group-item"><strong>Address:</strong> <%= user.address %></li>
       <li class="list-group-item"><strong>City:</strong> <%= user.city %></li>
     </ul>

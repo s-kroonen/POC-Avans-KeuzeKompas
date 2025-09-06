@@ -1,4 +1,3 @@
-// controllers/loginController.js
 const bcrypt = require('bcryptjs');
 const userRepository = require('../repositories/userRepository');
 
@@ -8,20 +7,29 @@ module.exports = {
   login: (req, res) => {
     const { email, password } = req.body;
 
-    userRepository.findByEmail(email, async (err, results) => {
-      if (err) return res.send('Database error');
-      if (results.length === 0) return res.send('No user found');
+    userRepository.findByEmail(email, (err, results) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.render('login', { error: 'Database error' });
+      }
+      if (results.length === 0) {
+        return res.render('login', { error: 'No user found with that email' });
+      }
 
       const user = results[0];
-      const match = await bcrypt.compare(password, user.password);
-      if (!match) return res.send('Invalid password');
+      bcrypt.compare(password, user.password, (err, match) => {
+        if (err || !match) {
+          return res.render('login', { error: 'Invalid password' });
+        }
 
-      req.session.user = {
-        id: user.id,
-        name: user.first_name,
-        role: user.role
-      };
-      res.redirect('/');
+        req.session.user = {
+          id: user.customer_id,
+          name: user.first_name,
+          email: user.email,
+          role: 'customer'
+        };
+        res.redirect('/profile');
+      });
     });
   },
 
