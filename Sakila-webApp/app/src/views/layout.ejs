@@ -18,6 +18,16 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/films">Films</a></li>
                     <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
+                    <% if (user && user.role === 'admin') { %>
+                        <li class="nav-item"><a class="nav-link" href="/admin/manageStores">Manage Stores</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/admin/manageManagers">Manage Managers</a></li>
+                    <% } %>
+                    <% if (user && user.role === 'manager') { %>
+                        <li class="nav-item"><a class="nav-link" href="/staff/invite">Invite Staff</a></li>
+                    <% } %>
+                    <% if (user && user.role === 'staff') { %>
+                        <li class="nav-item"><a class="nav-link" href="/staff/dashboard">Staff Dashboard</a></li>
+                    <% } %>
                     <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
                 </ul>
             </div>

@@ -1,0 +1,17 @@
+<h2>Invite Staff</h2>
+<% if (typeof error !== 'undefined') { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<form method="POST" action="/staff/invite">
+  <input type="email" name="email" placeholder="Staff Email" required />
+  <input type="text" name="first_name" placeholder="First Name" required />
+  <input type="text" name="last_name" placeholder="Last Name" required />
+  <select name="store_id" required>
+    <option value="">Select Store</option>
+    <% stores.forEach(function(store) { %>
+      <option value="<%= store.store_id %>">Store <%= store.store_id %></option>
+    <% }) %>
+  </select>
+  <button type="submit">Invite Staff</button>
+</form>
+<a href="/profile">Back to Profile</a>

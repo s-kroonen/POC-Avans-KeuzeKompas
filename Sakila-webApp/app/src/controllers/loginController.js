@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
-const userRepository = require('../repositories/userRepository');
+const StaffRepository = require('../repositories/staffRepository');
+const CustomerRepository = require('../repositories/userRepository');
 
 module.exports = {
   showLogin: (req, res) => res.render('login'),
@@ -7,28 +8,30 @@ module.exports = {
   login: (req, res) => {
     const { email, password } = req.body;
 
-    userRepository.findByEmail(email, (err, results) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.render('login', { error: 'Database error' });
-      }
-      if (results.length === 0) {
-        return res.render('login', { error: 'No user found with that email' });
+    // Try staff first
+    StaffRepository.findByEmailWithRole(email, (err, staff) => {
+      if (err) return res.render('login', { error: 'Database error' });
+
+      if (staff) {
+        return bcrypt.compare(password, staff.password, (err, match) => {
+          if (err || !match) return res.render('login', { error: 'Invalid password' });
+
+          req.session.user = staff;
+          return res.redirect('/profile');
+        });
       }
 
-      const user = results[0];
-      bcrypt.compare(password, user.password, (err, match) => {
-        if (err || !match) {
-          return res.render('login', { error: 'Invalid password' });
-        }
+      // Fall back to customer
+      CustomerRepository.findByEmail(email, (err, customer) => {
+        if (err) return res.render('login', { error: 'Database error' });
+        if (!customer) return res.render('login', { error: 'No user found with that email' });
 
-        req.session.user = {
-          id: user.customer_id,
-          name: user.first_name,
-          email: user.email,
-          role: 'customer'
-        };
-        res.redirect('/profile');
+        bcrypt.compare(password, customer.password, (err, match) => {
+          if (err || !match) return res.render('login', { error: 'Invalid password' });
+          customer.role = 'customer';
+          req.session.user = customer;
+          return res.redirect('/profile');
+        });
       });
     });
   },

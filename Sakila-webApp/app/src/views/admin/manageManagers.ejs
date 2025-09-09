@@ -1,0 +1,48 @@
+<h1>Manage Store Managers</h1>
+<% if (typeof error !== 'undefined') { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<% if (typeof success !== 'undefined') { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<h2>Current Managers</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% managers.forEach(function(manager) { %>
+      <tr>
+        <td><%= manager.first_name %> <%= manager.last_name %></td>
+        <td><%= manager.email %></td>
+        <td>
+          <form method="POST" action="/admin/remove-manager/<%= manager.id %>" style="display:inline;">
+            <button type="submit" class="btn btn-danger">Remove</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<h2>Add New Manager</h2>
+<form method="POST" action="/admin/add-manager">
+  <div class="mb-3">
+    <input type="text" name="first_name" placeholder="First Name" required class="form-control" />
+  </div>
+  <div class="mb-3">
+    <input type="text" name="last_name" placeholder="Last Name" required class="form-control" />
+  </div>
+  <div class="mb-3">
+    <input type="email" name="email" placeholder="Email" required class="form-control" />
+  </div>
+  <div class="mb-3">
+    <input type="password" name="password" placeholder="Password" required class="form-control" />
+  </div>
+  <button type="submit" class="btn btn-primary">Add Manager</button>
+</form>

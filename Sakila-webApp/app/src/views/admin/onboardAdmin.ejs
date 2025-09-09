@@ -1,0 +1,19 @@
+<h2>Onboard Admin</h2>
+<% if (typeof error !== 'undefined') { %>
+  <div class="alert alert-danger">
+    <%= error %>
+  </div>
+<% } %>
+<form method="POST" action="/admin/onboard">
+  <input type="text" name="first_name" placeholder="First Name" required />
+  <input type="text" name="last_name" placeholder="Last Name" required />
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="password" name="password" placeholder="Password" required />
+  <select name="store_id" required>
+    <option value="">Select Store</option>
+    <% stores.forEach(function(store) { %>
+      <option value="<%= store.store_id %>">Store <%= store.store_id %></option>
+    <% }) %>
+  </select>
+  <button type="submit">Onboard Admin</button>
+</form>
