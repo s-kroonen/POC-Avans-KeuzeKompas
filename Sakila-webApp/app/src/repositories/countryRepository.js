@@ -19,7 +19,7 @@ class CountryRepository {
   static findByName(name, callback) {
     db.query('SELECT * FROM country WHERE country = ?', [name], (err, results) => {
       if (err) return callback(err);
-      callback(null, Country.fromRows(results));
+      callback(null, Country.fromRow(results[0]));
     });
   }
 
