@@ -9,7 +9,7 @@ jest.mock('../repositories/storeRepository', () => ({
 }));
 jest.mock('../repositories/userRepository', () => ({
   findByEmail: jest.fn(),
-  getCustomerProfile: jest.fn()
+  getProfile: jest.fn()
 }));
 jest.mock('bcryptjs', () => ({
   compare: jest.fn()
@@ -17,6 +17,9 @@ jest.mock('bcryptjs', () => ({
 jest.mock('../services/filmService', () => ({
   getPagedFilms: jest.fn(),
   getFilmDetails: jest.fn()
+}));
+jest.mock('../repositories/staffRepository', () => ({
+  findByEmailWithRole: jest.fn()
 }));
 
 const registerController = require('../controllers/registerController');
@@ -29,8 +32,13 @@ const userService = require('../services/userService');
 const countryRepo = require('../repositories/countryRepository');
 const storeRepo = require('../repositories/storeRepository');
 const userRepo = require('../repositories/userRepository');
+const staffRepo = require('../repositories/staffRepository');
 const bcrypt = require('bcryptjs');
 const filmService = require('../services/filmService');
+const Customer = require('../models/Customer');
+const Staff = require('../models/Staff');
+
+
 
 describe('registerController', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -109,7 +117,7 @@ describe('profileController', () => {
   beforeEach(() => jest.clearAllMocks());
 
   test('showProfile renders user profile', done => {
-    userRepo.getCustomerProfile.mockImplementation((id, cb) => cb(null, [{ first_name: 'Test', last_name: 'User', email: 'test@example.com', store_id: 1, address: 'Main St', city: 'Amsterdam' }]));
+    userRepo.getProfile.mockImplementation((id, cb) => cb(null, [{ first_name: 'Test', last_name: 'User', email: 'test@example.com', store_id: 1, address: 'Main St', city: 'Amsterdam' }]));
     const req = { session: { user: { id: 1, role: 'customer' } } };
     const res = { render: jest.fn() };
     profileController.showProfile(req, res);
@@ -130,18 +138,21 @@ describe('profileController', () => {
   });
 
   test('showProfile handles error', done => {
-    userRepo.getCustomerProfile.mockImplementation((id, cb) => cb(new Error('fail')));
-    const req = { session: { user: { id: 1 } } };
+    userRepo.getProfile.mockImplementation((id, cb) => cb(new Error('fail')));
+    const req = { session: { user: { id: 1, role: 'customer' } } };
     const res = { render: jest.fn() };
+
     profileController.showProfile(req, res);
+
     setImmediate(() => {
       expect(res.render).toHaveBeenCalledWith('users/profile', {
         error: 'Could not load profile',
-        user: {}
+        user: { id: 1, role: 'customer' }
       });
       done();
     });
   });
+
 });
 
 describe('loginController', () => {
@@ -153,29 +164,91 @@ describe('loginController', () => {
     expect(res.render).toHaveBeenCalledWith('login');
   });
 
-  test('login success redirects to profile', done => {
-    userRepo.findByEmail.mockImplementation((email, cb) => cb(null, [{ customer_id: 1, first_name: 'Test', password: 'hashedpw', email: 'test@example.com' }]));
+
+  test('login success redirects for customer', done => {
+    // No staff found
+    staffRepo.findByEmailWithRole.mockImplementation((email, cb) => cb(null, null));
+
+    // Customer found
+    userRepo.findByEmail.mockImplementation((email, cb) =>
+      cb(null, Customer.fromRow({
+        customer_id: 1,
+        first_name: 'Test',
+        last_name: 'User',
+        email: 'test@example.com',
+        password: 'hashedpw'
+      }))
+    );
+
     bcrypt.compare.mockImplementation((pw, hash, cb) => cb(null, true));
+
     const req = { body: { email: 'test@example.com', password: 'pw' }, session: {} };
     const res = { render: jest.fn(), redirect: jest.fn() };
+
     loginController.login(req, res);
+
     setImmediate(() => {
-      expect(req.session.user).toEqual({
-        id: 1,
-        name: 'Test',
-        email: 'test@example.com',
-        role: 'customer'
-      });
+      expect(req.session.user).toEqual(
+        expect.objectContaining({
+          id: 1,
+          firstName: 'Test',
+          lastName: 'User',
+          email: 'test@example.com',
+          role: 'customer'
+        })
+      );
       expect(res.redirect).toHaveBeenCalledWith('/profile');
       done();
     });
   });
 
-  test('login handles db error', done => {
-    userRepo.findByEmail.mockImplementation((email, cb) => cb(new Error('fail')));
-    const req = { body: { email: 'test@example.com', password: 'pw' }, session: {} };
-    const res = { render: jest.fn() };
+  test('login success redirects for staff', done => {
+    // Staff found
+    staffRepo.findByEmailWithRole.mockImplementation((email, cb) =>
+      cb(null, Staff.fromRow({
+        staff_id: 2,
+        first_name: 'Staff',
+        last_name: 'Member',
+        email: 'staff@example.com',
+        password: 'hashedpw',
+        is_admin: false
+      }))
+    );
+
+    bcrypt.compare.mockImplementation((pw, hash, cb) => cb(null, true));
+
+    const req = { body: { email: 'staff@example.com', password: 'pw' }, session: {} };
+    const res = { render: jest.fn(), redirect: jest.fn() };
+
     loginController.login(req, res);
+
+    setImmediate(() => {
+      expect(req.session.user).toBeInstanceOf(Staff);
+      expect(req.session.user).toMatchObject({
+        id: 2,
+        first_name: 'Staff',
+        last_name: 'Member',
+        email: 'staff@example.com',
+        is_admin: false
+      });
+
+      expect(res.redirect).toHaveBeenCalledWith('/profile');
+      done();
+    });
+  });
+
+
+
+
+  test('login handles db error', done => {
+    staffRepo.findByEmailWithRole.mockImplementation((email, cb) => cb(null, null));
+    userRepo.findByEmail.mockImplementation((email, cb) => cb(new Error('fail')));
+
+    const req = { body: { email: 'test@example.com', password: 'pw' }, session: {} };
+    const res = { render: jest.fn(), redirect: jest.fn() };
+
+    loginController.login(req, res);
+
     setImmediate(() => {
       expect(res.render).toHaveBeenCalledWith('login', { error: 'Database error' });
       done();
@@ -183,15 +256,20 @@ describe('loginController', () => {
   });
 
   test('login handles no user found', done => {
-    userRepo.findByEmail.mockImplementation((email, cb) => cb(null, []));
+    staffRepo.findByEmailWithRole.mockImplementation((email, cb) => cb(null, null));
+    userRepo.findByEmail.mockImplementation((email, cb) => cb(null, null));
+
     const req = { body: { email: 'test@example.com', password: 'pw' }, session: {} };
-    const res = { render: jest.fn() };
+    const res = { render: jest.fn(), redirect: jest.fn() };
+
     loginController.login(req, res);
+
     setImmediate(() => {
       expect(res.render).toHaveBeenCalledWith('login', { error: 'No user found with that email' });
       done();
     });
   });
+
 
   test('login handles invalid password', done => {
     userRepo.findByEmail.mockImplementation((email, cb) => cb(null, [{ customer_id: 1, first_name: 'Test', password: 'hashedpw', email: 'test@example.com' }]));
@@ -237,7 +315,7 @@ describe('filmController', () => {
     }));
     const req = { query: { page: '1', pageSize: '20' } };
     const res = { render: jest.fn() };
-    filmController.list(req, res, () => {});
+    filmController.list(req, res, () => { });
     setImmediate(() => {
       expect(res.render).toHaveBeenCalledWith('films/list', {
         title: 'Films',
@@ -266,7 +344,7 @@ describe('filmController', () => {
     filmService.getFilmDetails.mockImplementation((id, cb) => cb(null, { film_id: 1, title: 'Film 1' }));
     const req = { params: { id: '1' } };
     const res = { render: jest.fn() };
-    filmController.detail(req, res, () => {});
+    filmController.detail(req, res, () => { });
     setImmediate(() => {
       expect(res.render).toHaveBeenCalledWith('films/detail', { title: 'Film 1', film: { film_id: 1, title: 'Film 1' } });
       done();
@@ -277,7 +355,7 @@ describe('filmController', () => {
     filmService.getFilmDetails.mockImplementation((id, cb) => cb(null, null));
     const req = { params: { id: '999' } };
     const res = { status: jest.fn(() => res), render: jest.fn() };
-    filmController.detail(req, res, () => {});
+    filmController.detail(req, res, () => { });
     setImmediate(() => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.render).toHaveBeenCalledWith('layout', {
@@ -303,7 +381,7 @@ describe('filmController', () => {
   test('detail redirects if id is NaN', () => {
     const req = { params: { id: 'abc' } };
     const res = { redirect: jest.fn() };
-    filmController.detail(req, res, () => {});
+    filmController.detail(req, res, () => { });
     expect(res.redirect).toHaveBeenCalledWith('/films');
   });
 });

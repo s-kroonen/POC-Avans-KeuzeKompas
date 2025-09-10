@@ -12,22 +12,26 @@ class StaffRepository {
   }
 
   static findByEmailWithRole(email, callback) {
-    this.findByEmail(email, (err, staff) => {
+  this.findByEmail(email, (err, row) => {
+    if (err) return callback(err);
+    if (!row) return callback(null, null);
+
+    // Always convert raw row to Staff instance
+    const staff = Staff.fromRow(row);
+
+    if (staff.is_admin) {
+      staff.role = 'admin';
+      return callback(null, staff);
+    }
+
+    StoreRepository.isManager(staff.id, (err, isManager) => {
       if (err) return callback(err);
-      if (!staff) return callback(null, null);
-
-      if (staff.is_admin) {
-        staff.role = 'admin';
-        return callback(null, staff);
-      }
-
-      StoreRepository.isManager(staff.id, (err, isManager) => {
-        if (err) return callback(err);
-        staff.role = isManager ? 'manager' : 'staff';
-        callback(null, staff);
-      });
+      staff.role = isManager ? 'manager' : 'staff';
+      callback(null, staff);
     });
-  }
+  });
+}
+
 
   static findById(id, callback) {
     const query = 'SELECT * FROM staff WHERE staff_id = ?';

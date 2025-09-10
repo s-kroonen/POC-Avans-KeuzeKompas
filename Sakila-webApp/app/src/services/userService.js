@@ -129,15 +129,20 @@ module.exports.registerCustomer = (data, callback) => {
                 return callback(new Error('Country not found'));
             }
             // Find or create city
-            cityRepo.findOrCreate(data.city, country.country_id, (err, city) => {
+            cityRepo.create({city: data.city, country_id: country.country_id}, (err, city) => {
                 if (err || !city) {
                     console.error('City error:', err);
                     return callback(new Error('City not found or created'));
                 }
                 // Create address
                 addressRepo.findOrCreate(
-                    { address: data.address, district: data.district, postal_code: data.postal_code, phone: data.phone },
-                    city.city_id,
+                    {
+                        address: data.address,
+                        district: data.district,
+                        postal_code: data.postal_code,
+                        phone: data.phone,
+                        city_id: city.city_id
+                    },
                     (err, address) => {
                         if (err || !address) {
                             console.error('Address error:', err);
@@ -150,7 +155,7 @@ module.exports.registerCustomer = (data, callback) => {
                                 return callback(new Error('Password hash failed'));
                             }
                             // Create customer
-                            userRepo.createCustomer({
+                            userRepo.create({
                                 store_id: data.store_id,
                                 email: data.email,
                                 password: hashed,

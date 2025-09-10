@@ -196,10 +196,11 @@ describe('FilmRepository', () => {
 //
 describe('AddressRepository', () => {
   test('findOrCreate finds address', done => {
-    db.query.mockImplementationOnce((sql, params, cb) => cb(null, [{ address_id: 5 }]));
-    AddressRepository.findOrCreate({ address: 'Main St', district: 'District' }, 1, (err, result) => {
+    db.query.mockImplementationOnce((sql, params, cb) => cb(null, [{ address_id: 5, address: 'Main St', district: 'District', city_id: 1 }]));
+    AddressRepository.findOrCreate({ address: 'Main St', district: 'District' }, (err, address) => {
       expect(err).toBeNull();
-      expect(result.address_id).toBe(5);
+      expect(address).toBeInstanceOf(Address);
+      expect(address.id).toBe(5);
       done();
     });
   });
@@ -207,10 +208,12 @@ describe('AddressRepository', () => {
   test('findOrCreate creates address if not found', done => {
     db.query
       .mockImplementationOnce((sql, params, cb) => cb(null, [])) // Not found
-      .mockImplementationOnce((sql, params, cb) => cb(null, { insertId: 6 })); // Insert
-    AddressRepository.findOrCreate({ address: 'New St', district: 'District' }, 1, (err, result) => {
+      .mockImplementationOnce((sql, params, cb) => cb(null, { insertId: 6 })) // Insert
+      .mockImplementationOnce((sql, params, cb) => cb(null, [{ address_id: 6, address: 'New St', district: 'District', city_id: 1 }])); // 3: select after insert
+    AddressRepository.findOrCreate({ address: 'New St', district: 'District' }, (err, address) => {
       expect(err).toBeNull();
-      expect(result.address_id).toBe(6);
+      expect(address).toBeInstanceOf(Address);
+      expect(address.id).toBe(6);
       done();
     });
   });
