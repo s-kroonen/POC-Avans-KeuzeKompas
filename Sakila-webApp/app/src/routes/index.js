@@ -4,6 +4,7 @@ const router = express.Router();
 const homeController = require('../controllers/homeController');
 const filmController = require('../controllers/filmController');
 const profileController = require('../controllers/profileController');
+const staffController = require('../controllers/staffController');
 
 // Films
 router.get('/', homeController.getHome);
@@ -14,6 +15,11 @@ router.get('/films/:id', filmController.detail);
 
 const { requireLogin, requireStaff, requireAdmin } = require('../middleware/auth');
 
+router.get('/staff/invite', requireAdmin, staffController.showInvite);
+router.post('/staff/invite', requireAdmin, staffController.invite);
+
+router.get('/staff/onboard/:token', staffController.showOnboard);
+router.post('/staff/onboard/:token', staffController.onboard);
 
 router.get('/admin', requireAdmin, (req, res) => {
   res.send('Admin area');

@@ -1,6 +1,7 @@
 jest.mock('bcryptjs', () => ({
   compare: jest.fn(),
-  hash: jest.fn((pw, salt, cb) => cb(null, 'hashedpw')) 
+  hash: jest.fn((pw, salt, cb) => cb(null, 'hashedpw')),
+  hashSync: jest.fn((pw, salt) => 'hashedpw')
 }));
 jest.mock('../services/userService', () => ({
   registerCustomer: jest.fn(),

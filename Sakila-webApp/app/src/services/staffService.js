@@ -3,19 +3,65 @@ const bcrypt = require('bcryptjs');
 
 module.exports = {
     inviteStaff: (data, callback) => {
-        // Logic to send an invitation to the staff member
-        // This could involve sending an email with a registration link
-        // todo: implement email sending
+        // Generate unique token
+        const token = crypto.randomUUID();
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
+        staffRepo.createInvitation(
+            {
+                email: data.email,
+                token,
+                store_id: data.store_id,
+                is_admin: data.is_admin || false,
+                is_manager: data.is_manager || false,
+                expires_at: expiresAt
+            },
+            (err, result) => {
+                if (err) {
+                    console.error('Invitation error:', err);
+                    return callback(new Error('Failed to invite staff'));
+                }
+
+                // TODO: integrate email service here
+                // Example invite link: `/staff/onboard/${token}`
+                console.log(`Invite link for ${data.email}: http://localhost:3000/staff/onboard/${token}`);
+
+                callback(null, result);
+            }
+        );
     },
 
-    onboardStaff: (data, callback) => {
-        // Logic to onboard the staff member after they accept the invitation
-        staffRepo.create(data, (err, result) => {
-            if (err) {
-                console.error('Onboarding error:', err);
-                return callback(new Error('Failed to onboard staff member'));
+    onboardStaff: (token, staffData, callback) => {
+        staffRepo.findInvitationByToken(token, (err, invite) => {
+            if (err || !invite) {
+                return callback(new Error('Invalid or expired invitation'));
             }
-            callback(null, result);
+            // Hash chosen password
+            bcrypt.hash(staffData.password, 10, (err, hashedPw) => {
+                if (err) {
+                    console.error('Hash error:', err);
+                    return callback(new Error('Password hash failed'));
+                }
+                // Create staff account
+                staffRepo.create(
+                    {
+                        first_name: staffData.first_name,
+                        last_name: staffData.last_name,
+                        email: invite.email,
+                        store_id: invite.store_id,
+                        password: hashedPw,
+                        is_admin: invite.is_admin
+                    },
+                    (err, staff) => {
+                        if (err) return callback(new Error('Failed to onboard staff'));
+
+                        // Mark invitation as accepted
+                        staffRepo.markInvitationAccepted(token, () => { });
+
+                        callback(null, staff);
+                    }
+                );
+            });
         });
     },
 
@@ -49,5 +95,5 @@ module.exports = {
             });
         });
     }
-    
+
 };

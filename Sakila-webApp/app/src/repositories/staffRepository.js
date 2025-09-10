@@ -48,19 +48,36 @@ class StaffRepository {
       callback(null, Staff.fromRows(results));
     });
   }
-
-  static create(staffData, callback) {
-    const query = `
-      INSERT INTO staff (first_name, last_name, email, password, store_id, is_admin)
+  static createInvitation(data, cb) {
+    const sql = `
+      INSERT INTO staff_invitations (email, token, store_id, is_admin, is_manager, expires_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
-    db.query(query, [
-      staffData.first_name,
-      staffData.last_name,
-      staffData.email,
-      staffData.password,
-      staffData.store_id,
-      staffData.is_admin,
+    db.query(sql, [data.email, data.token, data.store_id, data.is_admin, data.is_manager, data.expires_at], cb);
+  }
+
+  static findInvitationByToken(token, cb) {
+    db.query(`SELECT * FROM staff_invitations WHERE token = ? AND accepted = 0`, [token], (err, rows) => {
+      cb(err, rows && rows[0]);
+    });
+  }
+
+  static markInvitationAccepted(token, cb) {
+    db.query(`UPDATE staff_invitations SET accepted = 1 WHERE token = ?`, [token], cb);
+  }
+
+  static create(data, callback) {
+    const sql = `
+      INSERT INTO staff (first_name, last_name, email, store_id, password, is_admin, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, 0)
+    `;
+    db.query(sql, [
+      data.first_name,
+      data.last_name,
+      data.email,
+      data.store_id,
+      data.password,
+      data.is_admin
     ], (err, result) => {
       if (err) return callback(err);
       // Return the newly created staff with ID

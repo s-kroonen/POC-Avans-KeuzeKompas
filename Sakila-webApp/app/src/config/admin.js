@@ -5,15 +5,9 @@ const bcrypt = require('bcryptjs');
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@sakila.com";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin123!"; // plain text for now
 
-const hashedPassword = bcrypt.hash(ADMIN_PASSWORD, 10, (err, hash) => {
-    if (err) {
-        console.error('Error hashing admin password:', err);
-        return null;
-    } else {
-        return hash;
-    }
-});
+const hashedPassword = bcrypt.hashSync(ADMIN_PASSWORD, 10);
+
 module.exports = {
-    email: ADMIN_EMAIL,
-    password: hashedPassword
+  email: ADMIN_EMAIL,
+  password: hashedPassword
 };
