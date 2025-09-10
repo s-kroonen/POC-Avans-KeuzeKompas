@@ -1,5 +1,10 @@
+jest.mock('bcryptjs', () => ({
+  compare: jest.fn(),
+  hash: jest.fn((pw, salt, cb) => cb(null, 'hashedpw')) 
+}));
 jest.mock('../services/userService', () => ({
-  registerCustomer: jest.fn()
+  registerCustomer: jest.fn(),
+  loginCustomer: jest.fn()
 }));
 jest.mock('../repositories/countryRepository', () => ({
   getAll: jest.fn()
@@ -10,9 +15,6 @@ jest.mock('../repositories/storeRepository', () => ({
 jest.mock('../repositories/userRepository', () => ({
   findByEmail: jest.fn(),
   getProfile: jest.fn()
-}));
-jest.mock('bcryptjs', () => ({
-  compare: jest.fn()
 }));
 jest.mock('../services/filmService', () => ({
   getPagedFilms: jest.fn(),
@@ -169,18 +171,16 @@ describe('loginController', () => {
     // No staff found
     staffRepo.findByEmailWithRole.mockImplementation((email, cb) => cb(null, null));
 
-    // Customer found
-    userRepo.findByEmail.mockImplementation((email, cb) =>
-      cb(null, Customer.fromRow({
+    // Customer found (through userService, not repo directly)
+    userService.loginCustomer.mockImplementation(({ email, password }, cb) => {
+      cb(null, new Customer({
         customer_id: 1,
         first_name: 'Test',
         last_name: 'User',
         email: 'test@example.com',
         password: 'hashedpw'
-      }))
-    );
-
-    bcrypt.compare.mockImplementation((pw, hash, cb) => cb(null, true));
+      }));
+    });
 
     const req = { body: { email: 'test@example.com', password: 'pw' }, session: {} };
     const res = { render: jest.fn(), redirect: jest.fn() };
@@ -188,19 +188,18 @@ describe('loginController', () => {
     loginController.login(req, res);
 
     setImmediate(() => {
-      expect(req.session.user).toEqual(
-        expect.objectContaining({
-          id: 1,
-          firstName: 'Test',
-          lastName: 'User',
-          email: 'test@example.com',
-          role: 'customer'
-        })
-      );
+      expect(req.session.user).toBeInstanceOf(Customer);
+      expect(req.session.user).toMatchObject({
+        id: 1,
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com'
+      });
       expect(res.redirect).toHaveBeenCalledWith('/profile');
       done();
     });
   });
+
 
   test('login success redirects for staff', done => {
     // Staff found
@@ -242,7 +241,7 @@ describe('loginController', () => {
 
   test('login handles db error', done => {
     staffRepo.findByEmailWithRole.mockImplementation((email, cb) => cb(null, null));
-    userRepo.findByEmail.mockImplementation((email, cb) => cb(new Error('fail')));
+    userService.loginCustomer.mockImplementation(({ email, password }, cb) => cb(new Error('fail')));
 
     const req = { body: { email: 'test@example.com', password: 'pw' }, session: {} };
     const res = { render: jest.fn(), redirect: jest.fn() };
@@ -250,14 +249,15 @@ describe('loginController', () => {
     loginController.login(req, res);
 
     setImmediate(() => {
-      expect(res.render).toHaveBeenCalledWith('login', { error: 'Database error' });
+      expect(res.render).toHaveBeenCalledWith('login', { error: 'fail' });
       done();
     });
   });
 
+
   test('login handles no user found', done => {
     staffRepo.findByEmailWithRole.mockImplementation((email, cb) => cb(null, null));
-    userRepo.findByEmail.mockImplementation((email, cb) => cb(null, null));
+    userService.loginCustomer.mockImplementation(({ email, password }, cb) => cb(null, null));
 
     const req = { body: { email: 'test@example.com', password: 'pw' }, session: {} };
     const res = { render: jest.fn(), redirect: jest.fn() };
@@ -271,17 +271,23 @@ describe('loginController', () => {
   });
 
 
+
   test('login handles invalid password', done => {
-    userRepo.findByEmail.mockImplementation((email, cb) => cb(null, [{ customer_id: 1, first_name: 'Test', password: 'hashedpw', email: 'test@example.com' }]));
-    bcrypt.compare.mockImplementation((pw, hash, cb) => cb(null, false));
+    userService.loginCustomer.mockImplementation(({ email, password }, cb) =>
+      cb(new Error('Invalid password'))
+    );
+
     const req = { body: { email: 'test@example.com', password: 'wrongpw' }, session: {} };
     const res = { render: jest.fn() };
+
     loginController.login(req, res);
+
     setImmediate(() => {
       expect(res.render).toHaveBeenCalledWith('login', { error: 'Invalid password' });
       done();
     });
   });
+
 
   test('logout destroys session and redirects', done => {
     const req = { session: { destroy: jest.fn(cb => cb()) } };

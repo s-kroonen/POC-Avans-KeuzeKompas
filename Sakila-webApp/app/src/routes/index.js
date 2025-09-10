@@ -12,13 +12,13 @@ router.get('/films/:id', filmController.detail);
 
 
 
-const { requireLogin } = require('../middleware/auth');
-const { requireRole } = require('../middleware/auth');
+const { requireLogin, requireStaff, requireAdmin } = require('../middleware/auth');
 
-router.get('/admin', requireRole('admin'), (req, res) => {
+
+router.get('/admin', requireAdmin, (req, res) => {
   res.send('Admin area');
 });
-router.get('/staff', requireRole('staff'), (req, res) => {
+router.get('/staff', requireStaff, (req, res) => {
   res.send('Staff area');
 });
 

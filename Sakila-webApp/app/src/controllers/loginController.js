@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
-const StaffRepository = require('../repositories/staffRepository');
-const CustomerRepository = require('../repositories/userRepository');
+const userService = require('../services/userService');
+const staffService = require('../services/staffService');
+const Staff = require('../models/Staff');
+const adminConfig = require('../config/admin');
 
 module.exports = {
   showLogin: (req, res) => res.render('login'),
@@ -8,30 +10,45 @@ module.exports = {
   login: (req, res) => {
     const { email, password } = req.body;
 
-    // Try staff first
-    StaffRepository.findByEmailWithRole(email, (err, staff) => {
-      if (err) return res.render('login', { error: 'Database error' });
+    // 1) Check hardcoded admin
+    if (email === adminConfig.email) {
+      bcrypt.compare(password, adminConfig.password, (err, match) => {
+        if (err || !match) {
+          return res.render('login', { error: 'Invalid password' });
+        } else {
+          // Create staff-like admin user
+          const adminUser = new Staff({
+            staff_id: 0, // not from DB
+            store_id: null,
+            first_name: "Admin",
+            last_name: "User",
+            email: adminConfig.email,
+            address_id: null,
+            username: "admin",
+            password: adminConfig.password,
+            is_admin: true
+          });
 
+          req.session.user = adminUser;
+          return res.redirect('/admin');
+        }
+      });
+    }
+
+    // 2) Normal staff login
+    staffService.loginStaff({ email, password }, (err, staff) => {
+      if (err) return res.render('login', { error: err.message });
       if (staff) {
-        return bcrypt.compare(password, staff.password, (err, match) => {
-          if (err || !match) return res.render('login', { error: 'Invalid password' });
-
-          req.session.user = staff;
-          return res.redirect('/profile');
-        });
+        req.session.user = staff;
+        return res.redirect('/profile');
       }
 
-      // Fall back to customer
-      CustomerRepository.findByEmail(email, (err, customer) => {
-        if (err) return res.render('login', { error: 'Database error' });
+      // 3) Customer fallback
+      userService.loginCustomer({ email, password }, (err, customer) => {
+        if (err) return res.render('login', { error: err.message });
         if (!customer) return res.render('login', { error: 'No user found with that email' });
-
-        bcrypt.compare(password, customer.password, (err, match) => {
-          if (err || !match) return res.render('login', { error: 'Invalid password' });
-          customer.role = 'customer';
-          req.session.user = customer;
-          return res.redirect('/profile');
-        });
+        req.session.user = customer;
+        return res.redirect('/profile');
       });
     });
   },

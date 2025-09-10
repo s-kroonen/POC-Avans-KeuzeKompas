@@ -1,5 +1,5 @@
 class Staff {
-  constructor({ staff_id, store_id, first_name, last_name, email, address_id, username, password, role, is_admin }) {
+  constructor({ staff_id, store_id, first_name, last_name, email, address_id, username, password, is_admin }) {
     this.id = staff_id;
     this.store_id = store_id;
     this.first_name = first_name;
