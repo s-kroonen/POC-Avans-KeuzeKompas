@@ -11,6 +11,7 @@ const authRoutes = require('./routes/auth');
 
 const app = express();
 
+// === Middleware ===
 app.use(expressLayouts);
 app.set('layout', 'layout'); // default layout
 
@@ -19,8 +20,6 @@ app.use(helmet());
 app.use(compression());
 app.use(morgan('dev'));
 
-// Static assets
-app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // EJS view engine
 app.set('views', path.join(__dirname, 'views'));
@@ -31,15 +30,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // === SESSION MUST COME BEFORE ROUTES ===
 app.use(session({
-    secret: "authsqlsakila",
-    resave: false,
-    saveUninitialized: false
+  secret: "authsqlsakila",
+  resave: false,
+  saveUninitialized: false
 }));
 
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
 });
+
+// Static assets
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 // === ROUTES ===
