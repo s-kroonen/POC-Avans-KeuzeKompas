@@ -18,7 +18,9 @@ module.exports.requireStaff = (req, res, next) => {
 
   // staff objects have is_admin property, customers do not
   if (typeof user.is_admin === 'undefined') {
-    return res.status(403).send('Staff access only');
+    // return res.status(403).send('Staff access only');
+    next({ status: 403, message: 'Staff access only' });
+
   }
 
   next();

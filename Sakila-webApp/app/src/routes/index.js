@@ -15,18 +15,12 @@ router.get('/films/:id', filmController.detail);
 
 const { requireLogin, requireStaff, requireAdmin } = require('../middleware/auth');
 
-router.get('/staff/invite', requireAdmin, staffController.showInvite);
-router.post('/staff/invite', requireAdmin, staffController.invite);
-
-router.get('/staff/onboard/:token', staffController.showOnboard);
-router.post('/staff/onboard/:token', staffController.onboard);
-
-router.get('/admin', requireAdmin, (req, res) => {
-  res.send('Admin area');
-});
-router.get('/staff', requireStaff, (req, res) => {
-  res.send('Staff area');
-});
+// router.get('/admin', requireAdmin, (req, res) => {
+//   res.send('Admin area');
+// });
+// router.get('/staff', requireStaff, (req, res) => {
+//   res.send('Staff area');
+// });
 
 router.get('/profile', requireLogin, profileController.showProfile);
 

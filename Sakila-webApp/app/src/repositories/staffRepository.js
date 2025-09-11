@@ -68,16 +68,19 @@ class StaffRepository {
 
   static create(data, callback) {
     const sql = `
-      INSERT INTO staff (first_name, last_name, email, store_id, password, is_admin, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, 0)
+      INSERT INTO staff (first_name, last_name, address_id, email, store_id, password, is_admin, active, username)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     db.query(sql, [
       data.first_name,
       data.last_name,
+      data.address_id,
       data.email,
       data.store_id,
       data.password,
-      data.is_admin
+      data.is_admin,
+      data.isactive,
+      data.username
     ], (err, result) => {
       if (err) return callback(err);
       // Return the newly created staff with ID

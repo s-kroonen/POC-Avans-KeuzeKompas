@@ -2,17 +2,32 @@
 <% if (typeof error !== 'undefined') { %>
   <div class="alert alert-danger"><%= error %></div>
 <% } %>
-<form method="POST" action="/staff/onboard">
-  <input type="text" name="first_name" placeholder="First Name" required />
-  <input type="text" name="last_name" placeholder="Last Name" required />
-  <input type="email" name="email" placeholder="Email" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <select name="role" required>
-    <option value="">Select Role</option>
-    <option value="staff">Staff</option>
-    <option value="admin">Admin</option>
+
+<form method="POST" action="/staff/onboard/<%= invite.token %>">
+  <input type="text" name="first_name" placeholder="First Name" value="<%= invite.first_name || '' %>" required />
+  <input type="text" name="last_name" placeholder="Last Name" value="<%= invite.last_name || '' %>" required />
+  <input type="email" name="email" value="<%= invite.email %>" readonly />
+  <input type="text" name="username" placeholder="User Name" required />
+  <input type="password" name="password" placeholder="Choose Password" required />
+
+  <h4>Address Details</h4>
+  <input type="text" name="address" placeholder="Street Address" required />
+  <input type="text" name="district" placeholder="District" required />
+  <input type="text" name="city" placeholder="City" required />
+  <select name="country" required>
+    <option value="">Select Country</option>
+    <% countries.forEach(function(country) { %>
+      <option value="<%= country.country %>"><%= country.country %></option>
+    <% }) %>
   </select>
-  <input type="text" name="store_id" placeholder="Store ID" required />
-  <button type="submit">Onboard Staff</button>
+  <input type="text" name="postal_code" placeholder="Postal Code" />
+  <input type="text" name="phone" placeholder="Phone" />
+
+  <!-- hidden fields to preserve store/role from the invite -->
+  <input type="hidden" name="store_id" value="<%= invite.store_id %>" />
+  <input type="hidden" name="is_admin" value="<%= invite.is_admin %>" />
+
+  <button type="submit" class="btn btn-primary mt-3">Complete Onboarding</button>
 </form>
-<a href="/staff">Back to Staff Management</a>
+
+<a href="/login" class="btn btn-link mt-2">Back to Login</a>

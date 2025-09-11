@@ -6,8 +6,6 @@ const morgan = require('morgan');
 const expressLayouts = require('express-ejs-layouts');
 const session = require("express-session");
 
-const routes = require('./routes');
-const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -57,8 +55,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // === ROUTES ===
+const routes = require('./routes');
+const authRoutes = require('./routes/auth');
+const adminRoutes = require("./routes/admin");
+const staffRoutes = require("./routes/staff");
+
 app.use('/', authRoutes);   // login/register
 app.use('/', routes);       // other routes
+app.use("/admin", adminRoutes);
+app.use("/staff", staffRoutes);
 
 // === 404 Handler ===
 app.use(function (req, res) {
