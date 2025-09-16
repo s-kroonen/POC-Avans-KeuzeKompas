@@ -1,32 +1,96 @@
-<h2>Register</h2>
+<h2 class="mb-4">Register</h2>
+
 <% if (typeof error !== 'undefined') { %>
   <div class="alert alert-danger">
     <%= error %>
   </div>
 <% } %>
+
 <form method="POST" action="/register">
-  <input type="text" name="first_name" placeholder="First name" required />
-  <input type="text" name="last_name" placeholder="Last name" required />
-  <input type="text" name="address" placeholder="Address" required />
-  <input type="text" name="district" placeholder="District" required />
-  <input type="text" name="city" placeholder="City" required />
-  <select name="country" required>
-    <option value="">Select country</option>
-    <% countries.forEach(function(country) { %>
-      <option value="<%= country.country %>">
-        <%= country.country %>
-      </option>
-    <% }) %>
-  </select>
-  <input type="text" name="postal_code" placeholder="Postal code" />
-  <input type="text" name="phone" placeholder="Phone" />
-  <select name="store_id" required>
-    <option value="">Select store</option>
-    <% stores.forEach(function(store) { %>
-      <option value="<%= store.store_id %>">Store <%= store.store_id %></option>
-    <% }) %>
-  </select>
-  <input type="email" name="email" placeholder="Email" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Register</button>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label for="first_name" class="form-label">First Name</label>
+      <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" required />
+    </div>
+
+    <div class="col-md-6">
+      <label for="last_name" class="form-label">Last Name</label>
+      <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last Name" required />
+    </div>
+
+    <div class="col-12">
+      <label for="address" class="form-label">Address</label>
+      <input type="text" class="form-control" id="address" name="address" placeholder="Address" required />
+    </div>
+
+    <div class="col-md-6">
+      <label for="district" class="form-label">District</label>
+      <input type="text" class="form-control" id="district" name="district" placeholder="District" required />
+    </div>
+
+    <div class="col-md-6">
+      <label for="city" class="form-label">City</label>
+      <input type="text" class="form-control" id="city" name="city" placeholder="City" required />
+    </div>
+
+    <div class="col-md-6">
+      <label for="country" class="form-label">Country</label>
+      <select class="form-select" id="country" name="country" required>
+        <option value="">Select Country</option>
+        <% countries.forEach(function(country) { %>
+          <option value="<%= country.country %>"><%= country.country %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label for="postal_code" class="form-label">Postal Code</label>
+      <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="Postal Code" />
+    </div>
+
+    <div class="col-md-6">
+      <label for="phone" class="form-label">Phone</label>
+      <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone" />
+    </div>
+
+    <div class="col-md-6">
+      <label for="store_id" class="form-label">Store</label>
+      <select class="form-select" id="store_id" name="store_id" required>
+        <option value="">Select Store</option>
+        <% stores.forEach(function(store) { %>
+          <option value="<%= store.store_id %>">Store <%= store.store_id %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Email" required />
+    </div>
+
+    <div class="col-md-6">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="Password" required />
+    </div>
+
+    <div class="col-12 mt-3">
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+    </div>
+  </div>
 </form>
+<script>
+  // Bootstrap validation
+  (function () {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
+</script>
