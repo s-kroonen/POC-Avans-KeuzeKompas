@@ -1,0 +1,85 @@
+<h1>Manage Staff</h1>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<% if (success) { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<h2>Add Staff</h2>
+<form method="POST" action="/admin/staff">
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <input type="text" class="form-control" name="first_name" placeholder="First Name" required>
+    </div>
+    <div class="col-md-6 mb-3">
+      <input type="text" class="form-control" name="last_name" placeholder="Last Name" required>
+    </div>
+  </div>
+  <div class="mb-3">
+    <input type="email" class="form-control" name="email" placeholder="Email" required>
+  </div>
+  <div class="mb-3">
+    <input type="text" class="form-control" name="username" placeholder="Username" required>
+  </div>
+  <div class="mb-3">
+    <input type="password" class="form-control" name="password" placeholder="Password" required>
+  </div>
+  <div class="mb-3">
+    <label>Store ID</label>
+    <input type="number" class="form-control" name="store_id">
+  </div>
+
+  <h4>Address</h4>
+  <div class="mb-3">
+    <input type="text" class="form-control" name="address" placeholder="Street Address" required>
+  </div>
+  <div class="mb-3">
+    <input type="text" class="form-control" name="district" placeholder="District" required>
+  </div>
+  <div class="mb-3">
+    <input type="text" class="form-control" name="postal_code" placeholder="Postal Code" required>
+  </div>
+  <div class="mb-3">
+    <input type="text" class="form-control" name="phone" placeholder="Phone" required>
+  </div>
+  <div class="mb-3">
+    <input type="text" class="form-control" name="city" placeholder="City" required>
+  </div>
+  <div class="mb-3">
+    <input type="text" class="form-control" name="country" placeholder="Country" required>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Add Staff</button>
+</form>
+
+<h2 class="mt-5">Current Staff</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% staff.forEach(function(s) { %>
+      <tr>
+        <td><%= s.first_name %> <%= s.last_name %></td>
+        <td><%= s.email %></td>
+        <td><%= s.active ? 'Active' : 'Inactive' %></td>
+        <td>
+          <% if (s.active) { %>
+            <form method="POST" action="/admin/remove-staffMember/<%= s.id %>" style="display:inline;">
+              <button type="submit" class="btn btn-danger">Deactivate</button>
+            </form>
+          <% } else { %>
+            <span class="badge bg-secondary">Inactive</span>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
