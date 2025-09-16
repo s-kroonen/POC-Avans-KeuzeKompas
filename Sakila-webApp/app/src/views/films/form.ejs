@@ -1,0 +1,52 @@
+<h1 class="mb-4"><%= title %></h1>
+
+<form method="post" action="<%= film.id ? '/films/' + film.id + '/edit' : '/films/new' %>">
+  <div class="mb-3">
+    <label>Title</label>
+    <input type="text" name="title" class="form-control" value="<%= film.title || '' %>" required>
+  </div>
+  <div class="mb-3">
+    <label>Description</label>
+    <textarea name="description" class="form-control"><%= film.description || '' %></textarea>
+  </div>
+  <div class="mb-3">
+    <label>Release Year</label>
+    <input type="number" name="release_year" class="form-control" value="<%= film.release_year || '' %>">
+  </div>
+  <div class="mb-3">
+    <label>Language</label>
+    <select name="language_id" class="form-select" required>
+      <% languages.forEach(l => { %>
+        <option value="<%= l.language_id %>" <%= l.language_id == film.language_id ? 'selected' : '' %>><%= l.name %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label>Rating</label>
+    <select name="rating" class="form-select">
+      <% ['G','PG','PG-13','R','NC-17'].forEach(r => { %>
+        <option value="<%= r %>" <%= r == film.rating ? 'selected' : '' %>><%= r %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label>Length</label>
+    <input type="number" name="length" class="form-control" value="<%= film.length || 0 %>" min="0">
+  </div>
+  <div class="mb-3">
+    <label>Rental Duration</label>
+    <input type="number" name="rental_duration" class="form-control" value="<%= film.rental_duration || 0 %>" min="0">
+  </div>
+  <div class="mb-3">
+    <label>Rental Rate</label>
+    <input type="number" name="rental_rate" class="form-control" value="<%= film.rental_rate || 0 %>" min="0" step="0.01">
+  </div>
+  <div class="mb-3">
+    <label>Replacement Cost</label>
+    <input type="number" name="replacement_cost" class="form-control" value="<%= film.replacement_cost || 0 %>" min="0" step="0.01">
+  </div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <% if (film.id) { %>
+    <a href="/films/<%= film.id %>/delete" class="btn btn-danger">Delete</a>
+  <% } %>
+</form>

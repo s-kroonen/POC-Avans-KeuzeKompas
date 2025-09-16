@@ -26,4 +26,47 @@ function detail(req, res, next) {
         res.render('films/detail', { title: film.title, film: film });
     });
 }
-module.exports = { list, detail };
+function newForm(req, res, next) {
+    filmService.getLanguages((err, languages) => {
+        if (err) return next(err);
+        res.render('films/form', { title: 'Add Film', film: {}, languages, errors: null });
+    });
+}
+
+function create(req, res, next) {
+    filmService.createFilm(req.body, (err, id) => {
+        if (err) return next(err);
+        res.redirect('/films/' + id);
+    });
+}
+
+function editForm(req, res, next) {
+    const id = parseInt(req.params.id, 10);
+    filmService.getFilmDetails(id, (err, film) => {
+        if (err) return next(err);
+        if (!film) return res.status(404).send('Not found');
+        filmService.getLanguages((err2, languages) => {
+            if (err2) return next(err2);
+            res.render('films/form', { title: 'Edit Film', film, languages, errors: null });
+        });
+    });
+}
+
+function update(req, res, next) {
+    const id = parseInt(req.params.id, 10);
+    const filmData = { ...req.body, id };
+    filmService.updateFilm(filmData, (err) => {
+        if (err) return next(err);
+        res.redirect('/films/' + id);
+    });
+}
+
+function remove(req, res, next) {
+    const id = parseInt(req.params.id, 10);
+    filmService.deleteFilm(id, (err) => {
+        if (err) return next(err);
+        res.redirect('/films');
+    });
+}
+
+module.exports = { list, detail, newForm, create, editForm, update, remove };
