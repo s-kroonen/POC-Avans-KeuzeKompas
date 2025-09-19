@@ -1,58 +1,85 @@
 const AdminService = require('../services/adminService');
-const countryRepo = require('../repositories/countryRepository');
-const cityRepo = require('../repositories/cityRepository');
-const addressRepo = require('../repositories/addressRepository');
 
 module.exports = {
-  manageStores: (req, res) => {
-    AdminService.getStores((err, stores) => {
-      if (err) return res.status(500).send("Error loading stores");
-      res.render("admin/manageStores", { user: req.session.user, stores });
+  showDashboard: (req, res) => {
+    res.render('admin/dashboard');
+  },
+  // ----- STORES -----
+  listStores: (req, res) => {
+    AdminService.getAllStores((err, stores) => {
+      if (err) return res.status(500).render('layout', {
+        title: 'Error',
+        body: `<div class="container py-5"><h1>Error loading stores</h1><p>${err.message}</p></div>`
+      });
+      res.render('admin/stores', { stores });
     });
   },
 
-  createStore: (req, res) => {
-    const data = req.body;
-    // build address first
-    countryRepo.findByName(data.country, (err, country) => {
-      if (err || !country) return res.render("admin/manageStores", { error: "Country not found", stores: [] });
+  storeDetail: (req, res) => {
+    if (req.params.id === "new") {
+      return res.render('admin/storeDetail', { store: {} });
+    }
+    AdminService.getStoreById(req.params.id, (err, store) => {
+      if (err || !store) return res.status(404).render('layout', {
+        title: 'Not Found',
+        body: '<div class="container py-5"><h1>Store Not Found</h1></div>'
+      });
+      res.render('admin/storeDetail', { store });
+    });
+  },
 
-      cityRepo.create({ city: data.city, country_id: country.country_id }, (err, city) => {
-        if (err || !city) return res.render("admin/manageStores", { error: "City error", stores: [] });
-
-        addressRepo.findOrCreate({
-          address: data.address,
-          district: data.district,
-          postal_code: data.postal_code,
-          phone: data.phone,
-          city_id: city.city_id
-        }, (err, address) => {
-          if (err || !address) return res.render("admin/manageStores", { error: "Address error", stores: [] });
-
-          AdminService.addStore({
-            managerStaffId: data.managerStaffId,
-            addressId: address.address_id
-          }, (err) => {
-            if (err) return res.render("admin/manageStores", { error: err.message, stores: [] });
-            res.redirect("/admin/manageStores");
-          });
+  saveStore: (req, res) => {
+    AdminService.saveStore(req.body, (err) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).render('layout', {
+          title: 'Error',
+          body: `<div class="container py-5"><h1>Error saving store</h1><p>${err.message}</p></div>`
         });
+      }
+      res.redirect('/admin/stores');
+    });
+  },
+
+  // ----- STAFF -----
+  listStaff: (req, res) => {
+    AdminService.getAllStaff((err, staff) => {
+      if (err) return res.status(500).render('layout', {
+        title: 'Error',
+        body: `<div class="container py-5"><h1>Error loading staff</h1><p>${err.message}</p></div>`
+      });
+      AdminService.getAllStores((e2, stores) => {
+        res.render('admin/staff', { staff, stores });
       });
     });
   },
 
-  showDashboard: (req, res) => {
-    if (!req.session.user || !req.session.user.is_admin) {
-      return res.status(403).send("Forbidden");
-    }
-    res.render("admin/dashboard", { user: req.session.user });
+  staffDetail: (req, res) => {
+    AdminService.getAllStores((e2, stores) => {
+      if (req.params.id === "new") {
+        return res.render('admin/staffDetail', { staff: {}, stores });
+      }
+      AdminService.getStaffById(req.params.id, (err, staff) => {
+        if (err || !staff) return res.status(404).render('layout', {
+          title: 'Not Found',
+          body: '<div class="container py-5"><h1>Staff Not Found</h1></div>'
+        });
+        res.render('admin/staffDetail', { staff, stores });
+      });
+    });
   },
 
-  // manageStores: (req, res) => {
-  //   res.render("admin/manageStores", { user: req.session.user });
-  // },
+  saveStaff: (req, res) => {
+    AdminService.saveStaff(req.body, (err) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).render('layout', {
+          title: 'Error',
+          body: `<div class="container py-5"><h1>Error saving staff</h1><p>${err.message}</p></div>`
+        });
+      }
+      res.redirect('/admin/staff');
+    });
 
-  manageStaff: (req, res) => {
-    res.render("admin/manageStaff", { user: req.session.user });
   }
 };

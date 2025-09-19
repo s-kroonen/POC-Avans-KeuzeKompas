@@ -5,16 +5,16 @@ const { requireAdmin } = require("../middleware/auth");
 
 
 // Dashboard
-router.get('/dashboard', requireAdmin, adminController.showDashboard);
+router.get('/', adminController.showDashboard);
 
 // ----- STORES -----
-router.get('/manageStores', requireAdmin, adminController.manageStores);
-router.post('/stores', requireAdmin, adminController.createStore);
-// router.post('/stores/:id/remove', requireAdmin, adminController.removeStore);
+router.get('/stores', adminController.listStores);
+router.get('/stores/:id', adminController.storeDetail);
+router.post('/stores/:id', adminController.saveStore);
 
-// ----- STAFF -----
-router.get('/manageStaff', requireAdmin, adminController.manageStaff);
-// router.post('/staff', requireAdmin, adminController.createStaff);
-// router.post('/remove-staffMember/:id', requireAdmin, adminController.removeStaff);
+// Staff routes
+router.get('/staff', adminController.listStaff);
+router.get('/staff/:id', adminController.staffDetail);
+router.post('/staff/:id', adminController.saveStaff);
 
 module.exports = router;

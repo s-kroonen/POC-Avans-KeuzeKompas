@@ -1,0 +1,27 @@
+<h2>Staff</h2>
+<a href="/admin/staff/new" class="btn btn-primary">+ Create Staff</a>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Staff ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Store</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% staff.forEach(s => { %>
+      <tr>
+        <td><%= s.id %></td>
+        <td><%= s.first_name %> <%= s.last_name %></td>
+        <td><%= s.email %></td>
+        <td><%= s.store_id %></td>
+        <td>
+          <a href="/admin/staff/<%= s.id %>" class="btn btn-sm btn-info">Edit</a>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

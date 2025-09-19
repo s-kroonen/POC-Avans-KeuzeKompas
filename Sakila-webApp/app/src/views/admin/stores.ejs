@@ -1,0 +1,25 @@
+<h2>Stores</h2>
+<a href="/admin/stores/new" class="btn btn-primary">+ Create Store</a>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Store ID</th>
+      <th>Manager</th>
+      <th>Address</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% stores.forEach(store => { %>
+      <tr>
+        <td><%= store.id %></td>
+        <td><%= store.managerStaffId %></td>
+        <td><%= store.addressid %></td>
+        <td>
+          <a href="/admin/stores/<%= store.id %>" class="btn btn-sm btn-info">Edit</a>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
