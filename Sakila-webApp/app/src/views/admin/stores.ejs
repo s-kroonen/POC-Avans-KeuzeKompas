@@ -7,6 +7,7 @@
       <th>Store ID</th>
       <th>Manager</th>
       <th>Address</th>
+      <th>Active</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -15,7 +16,8 @@
       <tr>
         <td><%= store.id %></td>
         <td><%= store.managerStaffId %></td>
-        <td><%= store.addressid %></td>
+        <td><%= store.addressId %></td>
+        <td><%= store.is_active %></td>
         <td>
           <a href="/admin/stores/<%= store.id %>" class="btn btn-sm btn-info">Edit</a>
         </td>

@@ -1,34 +1,56 @@
-<h2><%= store.store_id ? "Edit Store " + store.store_id : "Create Store" %></h2>
+<h2>
+  <%= store.id ? "Edit Store " + store.id : "Create Store" %>
+</h2>
 
-<form method="POST" action="/admin/stores/<%= store.id || "new" %>">
-  <div class="mb-3">
-    <label>Manager Staff ID</label>
-    <input type="number" name="manager_staff_id" class="form-control" value="<%= store.manager_staff_id || "" %>">
-  </div>
-  <div class="mb-3">
-    <label>Address</label>
-    <input type="text" name="address" class="form-control" value="<%= store.address || "" %>">
-  </div>
-  <div class="mb-3">
-    <label>District</label>
-    <input type="text" name="district" class="form-control" value="<%= store.district || "" %>">
-  </div>
-  <div class="mb-3">
-    <label>City</label>
-    <input type="text" name="city" class="form-control" value="<%= store.city || "" %>">
-  </div>
-  <div class="mb-3">
-    <label>Country</label>
-    <input type="text" name="country" class="form-control" value="<%= store.country || "" %>">
-  </div>
-  <div class="mb-3">
-    <label>Postal Code</label>
-    <input type="text" name="postal_code" class="form-control" value="<%= store.postal_code || "" %>">
-  </div>
-  <div class="mb-3">
-    <label>Phone</label>
-    <input type="text" name="phone" class="form-control" value="<%= store.phone || "" %>">
-  </div>
+<form method="POST" action="/admin/stores/<%= store.id || " new" %>">
+  <% if (store.id) { %>
+    <input type="hidden" name="store_id" value="<%= store.id %>">
+    <% } %>
+      <div class="form-group">
+        <label for="manager_staff_id">Manager</label>
+        <select class="form-control" id="manager_staff_id" name="manager_staff_id" required>
+          <option value="">-- Select Manager --</option>
+          <% staff.forEach(s=> { %>
+            <option value="<%= s.id %>" <%=store.managerStaffId===s.id ? 'selected' : '' %>>
+              <%= s.first_name %>
+                <%= s.last_name %>
+            </option>
+            <% }) %>
+        </select>
+      </div>
 
-  <button type="submit" class="btn btn-success">Save</button>
+      <div class="mb-3">
+        <label>Address</label>
+        <input type="text" name="address" class="form-control" value="<%= store.address || "" %>">
+      </div>
+      <div class="mb-3">
+        <label>District</label>
+        <input type="text" name="district" class="form-control" value="<%= store.district || "" %>">
+      </div>
+      <div class="mb-3">
+        <label>City</label>
+        <input type="text" name="city" class="form-control" value="<%= store.city || "" %>">
+      </div>
+      <div class="mb-3">
+        <label>Country</label>
+        <input type="text" name="country" class="form-control" value="<%= store.country || "" %>">
+      </div>
+      <div class="mb-3">
+        <label>Postal Code</label>
+        <input type="text" name="postal_code" class="form-control" value="<%= store.postal_code || "" %>">
+      </div>
+      <div class="mb-3">
+        <label>Phone</label>
+        <input type="text" name="phone" class="form-control" value="<%= store.phone || "" %>">
+      </div>
+      <div class="mb-3">
+        <label>Is Active</label>
+        <input type="checkbox" name="is_active" value="1" <%=store.is_active ? "checked" : "" %>>
+      </div>
+      <button type="submit" class="btn btn-success">Save</button>
 </form>
+<% if (store.id) { %>
+  <form method="POST" action="/admin/stores/<%= store.id %>/remove" style="display:inline;">
+    <button type="submit" class="btn btn-danger">Remove</button>
+  </form>
+  <% } %>

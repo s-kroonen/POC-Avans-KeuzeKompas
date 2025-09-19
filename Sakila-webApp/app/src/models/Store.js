@@ -1,8 +1,9 @@
 class Store {
-  constructor({ store_id, manager_staff_id, address_id }) {
+  constructor({ store_id, manager_staff_id, address_id, active }) {
     this.id = store_id;
     this.managerStaffId = manager_staff_id;
     this.addressId = address_id;
+    this.is_active = active; 
   }
 
   static fromRow(row) {

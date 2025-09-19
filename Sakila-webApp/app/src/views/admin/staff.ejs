@@ -8,6 +8,7 @@
       <th>Name</th>
       <th>Email</th>
       <th>Store</th>
+      <th>Active</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -18,6 +19,7 @@
         <td><%= s.first_name %> <%= s.last_name %></td>
         <td><%= s.email %></td>
         <td><%= s.store_id %></td>
+        <td><%= s.is_active %></td>
         <td>
           <a href="/admin/staff/<%= s.id %>" class="btn btn-sm btn-info">Edit</a>
         </td>

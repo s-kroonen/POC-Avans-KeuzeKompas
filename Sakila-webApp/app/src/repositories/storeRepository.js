@@ -29,8 +29,8 @@ class StoreRepository {
 
   static update(storeId, storeData, callback) {
     db.query(
-      'UPDATE store SET manager_staff_id = ?, address_id = ? WHERE store_id = ?',
-      [storeData.managerStaffId, storeData.addressId, storeId],
+      'UPDATE store SET manager_staff_id = ?, address_id = ?, active = ? WHERE store_id = ?',
+      [storeData.managerStaffId, storeData.addressId, storeData.is_active, storeId],
       (err) => {
         if (err) return callback(err);
         this.getById(storeId, callback);

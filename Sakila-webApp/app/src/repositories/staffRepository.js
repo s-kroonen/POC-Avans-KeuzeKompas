@@ -67,6 +67,7 @@ class StaffRepository {
   }
 
   static create(data, callback) {
+    console.log("Creating staff with data:", data);
     const sql = `
       INSERT INTO staff (first_name, last_name, address_id, email, store_id, password, is_admin, active, username)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -79,7 +80,7 @@ class StaffRepository {
       data.store_id,
       data.password,
       data.is_admin,
-      data.isactive,
+      data.is_active !== undefined ? data.is_active : false,
       data.username
     ], (err, result) => {
       if (err) return callback(err);
@@ -91,7 +92,7 @@ class StaffRepository {
   static update(id, updateData, callback) {
     const query = `
       UPDATE staff
-      SET first_name = ?, last_name = ?, email = ?, store_id = ?, is_admin = ?
+      SET first_name = ?, last_name = ?, email = ?, store_id = ?, is_admin = ?, active = ?
       WHERE staff_id = ?
     `;
     db.query(query, [
@@ -100,6 +101,7 @@ class StaffRepository {
       updateData.email,
       updateData.store_id,
       updateData.is_admin,
+      updateData.is_active,
       id
     ], (err) => {
       if (err) return callback(err);
