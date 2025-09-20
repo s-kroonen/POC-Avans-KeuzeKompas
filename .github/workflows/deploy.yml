@@ -52,23 +52,26 @@ jobs:
         run: npm install cypress --save-dev
         working-directory: Sakila-webApp/app
 
-      - name: Load schema into test DB
-        run: |
-          mysql -hmysql -P 3306 -u root -prootpassword sakila_test < Sakila-webApp/app/src/db/sakila_testing.sql
 
-      # - name: Seed test DB
-      #   run: node src/config/setup-test-db.js
-      #   working-directory: Sakila-webApp/app
       - name: Wait for MySQL
         run: |
           for i in {1..30}; do
-            if mysql -hmysql -uroot -prootpassword -e "SELECT 1" sakila_test; then
+            if mysql -h 127.0.0.1 -uroot -prootpassword -e "SELECT 1" sakila_test; then
               echo "MySQL is ready!"
               break
             fi
             echo "Waiting for MySQL..."
             sleep 2
           done
+
+      - name: Load schema into test DB
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -prootpassword sakila_test < Sakila-webApp/app/src/db/sakila_testing.sql
+
+      # - name: Seed test DB
+      #   run: node src/config/setup-test-db.js
+      #   working-directory: Sakila-webApp/app
+
 
 
       - name: Start server
