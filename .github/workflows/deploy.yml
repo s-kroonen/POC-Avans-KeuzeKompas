@@ -52,8 +52,19 @@ jobs:
         run: npm install cypress --save-dev
         working-directory: Sakila-webApp/app
 
+      - name: Seed test DB
+        run: node src/config/setup-test-db.js
+        working-directory: Sakila-webApp/app
+
+
+      - name: Start server
+        run: |
+          npm run start:test &
+          sleep 5 # wait for server to start
+        working-directory: Sakila-webApp/app
+
       - name: Run Cypress tests
-        run: npx cypress run --headless
+        run: npm run cy:run
         working-directory: Sakila-webApp/app
 
       - name: Trigger Portainer webhook
