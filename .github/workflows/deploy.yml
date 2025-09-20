@@ -24,11 +24,11 @@ jobs:
           --health-retries=5
 
     env:
-      DB_HOST: mysql
+      DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: rootpassword
-      DB_NAME: sakila_test
+      DB_NAME: sakila_testing
       NODE_ENV: test
 
     steps:

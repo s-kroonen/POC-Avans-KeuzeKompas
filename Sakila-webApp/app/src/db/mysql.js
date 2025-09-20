@@ -1,4 +1,3 @@
-// db/mysql.js
 const mysql = require('mysql2');
 
 // Determine environment
@@ -19,6 +18,20 @@ const pool = mysql.createPool({
   database: databaseName,
   charset: 'utf8mb4_general_ci',
 });
+
+// --- DB Logging / Connection Test ---
+if (process.env.NODE_ENV !== 'test') {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('[DB] Connection failed:', err.code, err.message);
+      process.exit(1); // fail fast in CI
+    } else {
+      console.log(`[DB] Connected to database '${databaseName}' at ${process.env.DB_HOST}:${process.env.DB_PORT}`);
+      connection.release();
+    }
+  });
+}
+
 
 function query(sql, params, cb) {
   // Support optional params

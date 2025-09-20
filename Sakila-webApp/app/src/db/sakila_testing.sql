@@ -11,10 +11,10 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 --
--- Database: `sakila`
+-- Database: `sakila_testing`
 --
-CREATE DATABASE IF NOT EXISTS `sakila` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE sakila;
+CREATE DATABASE IF NOT EXISTS `sakila_testing` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE sakila_testing;
 
 -- --------------------------------------------------------
 
