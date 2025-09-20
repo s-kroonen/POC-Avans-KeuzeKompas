@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const userService = require('../services/userService');
 const staffService = require('../services/staffService');
+const Customer = require('../models/Customer');
 const Staff = require('../models/Staff');
 const getAdminConfig = require('../config/admin');
 
@@ -35,7 +36,37 @@ module.exports = {
           });
 
           req.session.user = adminUser;
+          const redirectTo = req.session.redirectTo || '/admin';
+          delete req.session.redirectTo;
+          return res.redirect(redirectTo);
           return res.redirect('/admin');
+
+        });
+      }
+      // 1a) Check customer
+      if (email === adminConfig.customerEmail) {
+        return bcrypt.compare(password, adminConfig.customerPassword, (err, match) => {
+          if (err || !match) {
+            return res.render('login', { error: 'Invalid password' });
+          }
+
+          const adminUser = new Customer({
+            staff_id: 0,
+            store_id: null,
+            first_name: "Customer",
+            last_name: "User",
+            email: adminConfig.customerEmail,
+            address_id: null,
+            username: "customer",
+            password: adminConfig.customerPassword
+          });
+
+          req.session.user = adminUser;
+          const redirectTo = req.session.redirectTo || '/profile';
+          delete req.session.redirectTo;
+          return res.redirect(redirectTo);
+          return res.redirect('/admin');
+
         });
       }
 
@@ -44,6 +75,9 @@ module.exports = {
         if (err) return res.render('login', { error: err.message });
         if (staff) {
           req.session.user = staff;
+          const redirectTo = req.session.redirectTo || '/profile';
+          delete req.session.redirectTo;
+          return res.redirect(redirectTo);
           return res.redirect('/profile');
         }
 
@@ -53,6 +87,9 @@ module.exports = {
           if (!customer) return res.render('login', { error: 'No user found with that email' });
 
           req.session.user = customer;
+          const redirectTo = req.session.redirectTo || '/profile';
+          delete req.session.redirectTo;
+          return res.redirect(redirectTo);
           return res.redirect('/profile');
         });
       });

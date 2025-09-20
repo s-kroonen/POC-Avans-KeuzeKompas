@@ -4,73 +4,86 @@
   <input type="hidden" name="page" value="<%= page %>">
   <label class="me-2" for="pageSize">Films per page:</label>
   <select id="pageSize" name="pageSize" class="form-select w-auto">
-    <% [10, 20, 30, 50].forEach(opt => { %>
-      <option value="<%= opt %>" <%= pageSize == opt ? 'selected' : '' %>><%= opt %></option>
-    <% }) %>
+    <% [10, 20, 30, 50].forEach(opt=> { %>
+      <option value="<%= opt %>" <%=pageSize==opt ? 'selected' : '' %>><%= opt %>
+      </option>
+      <% }) %>
   </select>
 </form>
 <script src="../js/films.js"></script>
 
 
 <% if (films && films.length) { %>
-  
-    <div class="row row-cols-1 row-cols-md-4 g-4">
-        <% films.forEach(film => { %>
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <!-- Optional: Add a placeholder image -->
-                    <!-- <img src="https://via.placeholder.com/350x200?text=<%= encodeURIComponent(film.title) %>" class="card-img-top" alt="<%= film.title %>"> -->
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title"><%= film.title %></h5>
-                        <p class="card-text text-truncate"><%= film.description %></p>
-                        <a href="/films/<%= film.id %>" class="btn btn-primary mt-auto">View Details</a>
-                    </div>
-                </div>
-            </div>
-        <% }) %>
-    </div>
-<% } else { %>
-    <div class="alert alert-info text-center">No films found.</div>
-<% } %>
 
-<!-- Pagination -->
-<% if (totalPages > 1) { 
-    const maxButtons = 7; // 1st, ..., 3 before, current, 3 after, ..., last
-    let start = Math.max(2, page - 3);
-    let end = Math.min(totalPages - 1, page + 3);
-    if (page <= 4) { start = 2; end = Math.min(totalPages - 1, maxButtons); }
-    if (page >= totalPages - 3) { start = Math.max(2, totalPages - maxButtons + 1); end = totalPages - 1; }
-%>
-<nav aria-label="Page navigation" class="mt-4">
-  <ul class="pagination justify-content-center flex-wrap">
-    <!-- First page -->
-    <li class="page-item <%= page === 1 ? 'active' : '' %>">
-      <a class="page-link" href="/films?page=1&pageSize=<%= pageSize %>">1</a>
-    </li>
-    <% if (start > 2) { %>
-      <li class="page-item disabled"><span class="page-link">...</span></li>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    <% films.forEach(film=> { %>
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <!-- Optional: Add a placeholder image -->
+          <!-- <img src="https://via.placeholder.com/350x200?text=<%= encodeURIComponent(film.title) %>" class="card-img-top" alt="<%= film.title %>"> -->
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">
+              <a href="/films/<%= film.id %>">
+                <%= film.title %>
+              </a>
+            </h5>
+            <p class="card-text text-truncate">
+              <%= film.description %>
+            </p>
+            <a href="/films/<%= film.id %>" class="btn btn-primary mt-auto">View Details</a>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+  </div>
+  <% } else { %>
+    <div class="alert alert-info text-center">No films found.</div>
     <% } %>
-    <% for (let p = start; p <= end; p++) { %>
-      <li class="page-item <%= p === page ? 'active' : '' %>">
-        <a class="page-link" href="/films?page=<%= p %>&pageSize=<%= pageSize %>"><%= p %></a>
-      </li>
-    <% } %>
-    <% if (end < totalPages - 1) { %>
-      <li class="page-item disabled"><span class="page-link">...</span></li>
-    <% } %>
-    <!-- Last page -->
-    <% if (totalPages > 1) { %>
-      <li class="page-item <%= page === totalPages ? 'active' : '' %>">
-        <a class="page-link" href="/films?page=<%= totalPages %>&pageSize=<%= pageSize %>"><%= totalPages %></a>
-      </li>
-    <% } %>
-    <!-- Previous/Next -->
-    <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
-      <a class="page-link" href="/films?page=<%= page - 1 %>&pageSize=<%= pageSize %>">Previous</a>
-    </li>
-    <li class="page-item <%= page === totalPages ? 'disabled' : '' %>">
-      <a class="page-link" href="/films?page=<%= page + 1 %>&pageSize=<%= pageSize %>">Next</a>
-    </li>
-  </ul>
-</nav>
-<% } %>
+
+      <!-- Pagination -->
+      <% if (totalPages> 1) {
+        const maxButtons = 7; // 1st, ..., 3 before, current, 3 after, ..., last
+        let start = Math.max(2, page - 3);
+        let end = Math.min(totalPages - 1, page + 3);
+        if (page <= 4) { start=2; end=Math.min(totalPages - 1, maxButtons); } if (page>= totalPages - 3) { start =
+          Math.max(2, totalPages - maxButtons + 1); end = totalPages - 1; }
+          %>
+          <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center flex-wrap">
+              <!-- First page -->
+              <li class="page-item <%= page === 1 ? 'active' : '' %>">
+                <a class="page-link" href="/films?page=1&pageSize=<%= pageSize %>">1</a>
+              </li>
+              <% if (start> 2) { %>
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                <% } %>
+                  <% for (let p=start; p <=end; p++) { %>
+                    <li class="page-item <%= p === page ? 'active' : '' %>">
+                      <a class="page-link" href="/films?page=<%= p %>&pageSize=<%= pageSize %>">
+                        <%= p %>
+                      </a>
+                    </li>
+                    <% } %>
+                      <% if (end < totalPages - 1) { %>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <% } %>
+                          <!-- Last page -->
+                          <% if (totalPages> 1) { %>
+                            <li class="page-item <%= page === totalPages ? 'active' : '' %>">
+                              <a class="page-link" href="/films?page=<%= totalPages %>&pageSize=<%= pageSize %>">
+                                <%= totalPages %>
+                              </a>
+                            </li>
+                            <% } %>
+                              <!-- Previous/Next -->
+                              <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                  href="/films?page=<%= page - 1 %>&pageSize=<%= pageSize %>">Previous</a>
+                              </li>
+                              <li class="page-item <%= page === totalPages ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                  href="/films?page=<%= page + 1 %>&pageSize=<%= pageSize %>">Next</a>
+                              </li>
+            </ul>
+          </nav>
+          <% } %>

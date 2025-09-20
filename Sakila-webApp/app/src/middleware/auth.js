@@ -3,6 +3,8 @@
 // Require any logged-in user
 module.exports.requireLogin = (req, res, next) => {
   if (!req.session || !req.session.user) {
+    // store original URL
+    req.session.redirectTo = req.originalUrl;
     return res.redirect('/login');
   }
   next();
@@ -11,6 +13,8 @@ module.exports.requireLogin = (req, res, next) => {
 // Require staff (including admins)
 module.exports.requireStaff = (req, res, next) => {
   if (!req.session || !req.session.user) {
+    // store original URL
+    req.session.redirectTo = req.originalUrl;
     return res.redirect('/login');
   }
 
@@ -18,23 +22,24 @@ module.exports.requireStaff = (req, res, next) => {
 
   // staff objects have is_admin property, customers do not
   if (typeof user.is_admin === 'undefined') {
-    // return res.status(403).send('Staff access only');
-    next({ status: 403, message: 'Staff access only' });
-
+    return next({ status: 403, message: 'Staff access only' });
   }
 
   next();
 };
 
 
+
 // Require admin (subset of staff)
 module.exports.requireAdmin = (req, res, next) => {
   if (!req.session || !req.session.user) {
+    // store original URL
+    req.session.redirectTo = req.originalUrl;
     return res.redirect('/login');
   }
 
   if (!req.session.user.is_admin) {
-    next({ status: 403, message: 'Admin access only' });
+    return next({ status: 403, message: 'Admin access only' });
     // return res.status(403).send('Admin access only');
 
   }

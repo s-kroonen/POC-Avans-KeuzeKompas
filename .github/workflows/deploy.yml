@@ -9,6 +9,28 @@ jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: sakila_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_NAME: sakila_test
+      NODE_ENV: test
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,8 +44,16 @@ jobs:
         run: npm install
         working-directory: Sakila-webApp/app
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
+        working-directory: Sakila-webApp/app
+
+      - name: Install Cypress
+        run: npm install cypress --save-dev
+        working-directory: Sakila-webApp/app
+
+      - name: Run Cypress tests
+        run: npx cypress run --headless
         working-directory: Sakila-webApp/app
 
       - name: Trigger Portainer webhook

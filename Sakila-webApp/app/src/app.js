@@ -74,11 +74,20 @@ app.use(function (req, res) {
 });
 
 // === Error Handler ===
+// === Error Handler ===
 app.use(function (err, req, res, next) {
     console.error('[error]', err);
-    res.status(500).render('layout', {
-        title: 'Error',
-        body: '<div class="container py-5"><h1 class="display-6">Server Error</h1><p>An unexpected error occurred.</p></div>'
+
+    // Default status to 500 if not provided
+    const status = err.status || 500;
+    const message = err.message || 'An unexpected error occurred.';
+
+    res.status(status).render('layout', {
+        title: `Error ${status}`,
+        body: `<div class="container py-5">
+                  <h1 class="display-6">${status === 403 ? 'Access Denied' : 'Server Error'}</h1>
+                  <p>${message}</p>
+               </div>`
     });
 });
 

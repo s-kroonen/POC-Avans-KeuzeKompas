@@ -12,19 +12,3 @@
     </ul>
   </div>
 </div>
-
-<% if (user.role === 'manager') { %>
-  <div class="mt-4">
-    <h5>Manage Staff</h5>
-    <a href="/staff/invite" class="btn btn-primary">Invite Staff</a>
-  </div>
-<% } %>
-
-<% if (user.role === 'admin') { %>
-  <div class="mt-4">
-    <h5>Admin Actions</h5>
-    <a href="/admin/manageStores" class="btn btn-primary">Manage Stores</a>
-    <a href="/admin/manageManagers" class="btn btn-primary">Manage Managers</a>
-    <a href="/admin/onboardAdmin" class="btn btn-primary">Onboard Admin</a>
-  </div>
-<% } %>

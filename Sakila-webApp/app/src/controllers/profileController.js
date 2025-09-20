@@ -14,10 +14,6 @@ module.exports.showProfile = (req, res) => {
             Object.assign(user, results[0]);
             res.render('users/profile', { user });
         });
-    } else if (user.role === 'admin' || user.role === 'staff') {
-        // Staff/admin/manager
-        // You can fetch more details if needed, or just render
-        res.render('users/profile', { user });
     } else {
 
         return res.render('users/profile', { error: 'Could not load profile', user });
