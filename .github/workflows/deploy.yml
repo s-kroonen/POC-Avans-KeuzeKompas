@@ -24,7 +24,7 @@ jobs:
           --health-retries=5
 
     env:
-      DB_HOST: 127.0.0.1
+      DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: rootpassword
@@ -52,16 +52,38 @@ jobs:
         run: npm install cypress --save-dev
         working-directory: Sakila-webApp/app
 
-      - name: Seed test DB
-        run: node src/config/setup-test-db.js
-        working-directory: Sakila-webApp/app
+      - name: Load schema into test DB
+        run: |
+          mysql -hmysql -P 3306 -u root -prootpassword sakila_test < Sakila-webApp/app/src/db/sakila_testing.sql
+
+      # - name: Seed test DB
+      #   run: node src/config/setup-test-db.js
+      #   working-directory: Sakila-webApp/app
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysql -hmysql -uroot -prootpassword -e "SELECT 1" sakila_test; then
+              echo "MySQL is ready!"
+              break
+            fi
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
 
 
       - name: Start server
         run: |
           npm run start:test &
-          sleep 5 # wait for server to start
+          echo "Waiting for server..."
+          for i in {1..30}; do
+            if curl -s http://localhost:3000/films >/dev/null; then
+              echo "Server ready!"
+              break
+            fi
+            sleep 2
+          done
         working-directory: Sakila-webApp/app
+
 
       - name: Run Cypress tests
         run: npm run cy:run
