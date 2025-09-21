@@ -28,34 +28,27 @@
   <header class="about-header text-center mb-5">
     <div class="container">
       <h1 class="display-4 fw-bold">About Our Movie Rental System</h1>
-      <p class="lead">Built with modern web technologies and deployed with scalability in mind.</p>
+      <p class="lead">A full-stack Node.js + MySQL project showcasing CRUD, authentication, and CI/CD deployment.</p>
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="container mb-5">
     <div class="row g-5">
-      <!-- Sidebar Navigation -->
-      <!-- <aside class="col-md-3">
-        <div class="list-group shadow-sm">
-          <a href="/" class="list-group-item list-group-item-action">Home</a>
-          <a href="/films" class="list-group-item list-group-item-action">Movies</a>
-          <a href="/rentals" class="list-group-item list-group-item-action">Rentals</a>
-          <a href="/customers" class="list-group-item list-group-item-action">Customers</a>
-          <a href="/about" class="list-group-item list-group-item-action active">About</a>
-        </div>
-      </aside> -->
-
-      <!-- About Content -->
-      <section class="col-md-9">
+      <section class="col-md-9 mx-auto">
         <h2 class="mb-4">Overview</h2>
         <p>
-          This application is a movie rental system developed with <strong>Node.js</strong> and <strong>Express.js</strong>.
-          It demonstrates full-stack development with a focus on CRUD functionality, authentication, and a clean, responsive UI.
+          This application replicates a movie rental system using the official <strong>Sakila MySQL sample database</strong>.  
+          It demonstrates modern web development practices:
         </p>
-        <p>
-          The project is deployed using modern CI/CD pipelines, ensuring reliability and scalability for production use.
-        </p>
+        <ul>
+          <li>Server-side rendering with <strong>EJS</strong></li>
+          <li>Repository/DAO pattern for database access</li>
+          <li>Customer registration & login with password hashing</li>
+          <li>Staff invitation and onboarding workflows</li>
+          <li>Film CRUD with validation</li>
+          <li>Bootstrap 5 styled forms and layouts</li>
+        </ul>
 
         <h2 class="mt-5 mb-3">Technologies Used</h2>
         <div class="row row-cols-1 row-cols-md-2 g-4">
@@ -64,9 +57,9 @@
               <div class="card-body">
                 <h5 class="card-title">Backend</h5>
                 <ul class="mb-0">
-                  <li>Node.js</li>
-                  <li>Express.js</li>
-                  <li>REST API structure</li>
+                  <li>Node.js + Express.js</li>
+                  <li>Repository pattern (callbacks)</li>
+                  <li>Authentication & session handling</li>
                 </ul>
               </div>
             </div>
@@ -77,8 +70,8 @@
                 <h5 class="card-title">Frontend</h5>
                 <ul class="mb-0">
                   <li>EJS templating engine</li>
-                  <li>Bootstrap 5 for styling</li>
-                  <li>Custom JS and validation</li>
+                  <li>Bootstrap 5</li>
+                  <li>Custom validation scripts</li>
                 </ul>
               </div>
             </div>
@@ -88,9 +81,9 @@
               <div class="card-body">
                 <h5 class="card-title">Database</h5>
                 <ul class="mb-0">
-                  <li>MySQL (Sakila schema)</li>
-                  <li>Data access layer with repositories</li>
-                  <li>Staff & customer session handling</li>
+                  <li>MySQL (Sakila sample schema)</li>
+                  <li>Film, rental, staff, customer management</li>
+                  <li>Address lookup with countries/cities</li>
                 </ul>
               </div>
             </div>
@@ -100,9 +93,9 @@
               <div class="card-body">
                 <h5 class="card-title">Deployment</h5>
                 <ul class="mb-0">
+                  <li>Docker + Compose</li>
                   <li>CI/CD with GitHub Actions</li>
-                  <li>Hosted on with Docker</li>
-                  <li>Reverse proxy via Nginx</li>
+                  <li>Nginx reverse proxy</li>
                 </ul>
               </div>
             </div>
@@ -112,25 +105,26 @@
         <h2 class="mt-5 mb-3">Features by Version</h2>
         <ul>
           <li><strong>v1</strong> – Basic movie listings</li>
-          <li><strong>v2</strong> – Add movie form, improved styling, CI/CD setup</li>
-          <li><strong>v3</strong> – Add register and login forms. backend database</li>
-          <li><strong>v4</strong> – Better error handling, validation, Bootstrap styling</li>
-          <li><strong>v5</strong> – Customer & staff management features, documentation</li>
-          <li><strong>v6</strong> – Authentication for staff/customers, CRUD rental tracking</li>
+          <li><strong>v2</strong> – Film CRUD (create, update, delete)</li>
+          <li><strong>v3</strong> – Registration & login forms with DB integration</li>
+          <li><strong>v4</strong> – Validation, error handling, Bootstrap styling</li>
+          <li><strong>v5</strong> – Staff invitation & onboarding</li>
+          <li><strong>v6</strong> – Customer & staff session authentication</li>
+          <li><strong>v7</strong> – Rental management tracking</li>
         </ul>
 
         <h2 class="mt-5 mb-3">Future Development</h2>
         <ul>
-          <li>Rental views access history</li>
-          <li>Search functionality for movies & customers</li>
-          <li>Late fee & due date system</li>
+          <li>Search & filter for films/customers</li>
+          <li>Rental due dates & late fee system</li>
           <li>Public REST API</li>
+          <li>Cypress end-to-end test coverage</li>
         </ul>
 
         <h2 class="mt-5 mb-3">Source Code</h2>
         <p>
-          The project source code is available on GitHub:  
-          <a href="https://github.com/s-kroonen/POC-Avans-KeuzeKompas" target="_blank">https://github.com/s-kroonen/POC-Avans-KeuzeKompas</a>
+          View the project on GitHub:  
+          <a href="https://github.com/s-kroonen/POC-Avans-KeuzeKompas" target="_blank">github.com/s-kroonen/POC-Avans-KeuzeKompas</a>
         </p>
 
         <% if (user && user.is_admin) { %>
@@ -142,6 +136,5 @@
       </section>
     </div>
   </main>
-
 </body>
 </html>
