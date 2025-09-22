@@ -148,7 +148,7 @@ module.exports = {
 
           const storeData = {
             id: data.store_id,
-            managerStaffId: data.manager_staff_id,
+            managerStaffId: data.manager_staff_id || null,
             addressId: address.id,
             is_active: data.is_active
           };

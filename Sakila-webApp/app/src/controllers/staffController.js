@@ -13,8 +13,8 @@ module.exports = {
     });
   },
   invite: (req, res) => {
-    const { email, store_id, is_admin, is_manager } = req.body;
-    staffService.inviteStaff({ email, store_id, is_admin, is_manager }, (err) => {
+    const { email, store_id, is_admin } = req.body;
+    staffService.inviteStaff({ email, store_id, is_admin }, req, (err) => {
       if (err) {
         console.error('Error inviting staff:', err);
         return res.render('staff/invite', { error: err.message });

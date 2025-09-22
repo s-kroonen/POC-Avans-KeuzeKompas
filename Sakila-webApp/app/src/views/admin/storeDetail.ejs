@@ -8,7 +8,7 @@
     <% } %>
       <div class="form-group">
         <label for="manager_staff_id">Manager</label>
-        <select class="form-control" id="manager_staff_id" name="manager_staff_id" required>
+        <select class="form-control" id="manager_staff_id" name="manager_staff_id">
           <option value="">-- Select Manager --</option>
           <% staff.forEach(s=> { %>
             <option value="<%= s.id %>" <%=store.managerStaffId===s.id ? 'selected' : '' %>>

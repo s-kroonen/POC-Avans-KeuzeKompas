@@ -16,33 +16,33 @@ module.exports = {
             token,
             store_id: data.store_id,
             is_admin: data.is_admin || false,
-            is_manager: data.is_manager || false,
             expires_at: expiresAt
         }, (err, result) => {
             if (err) return callback(err);
 
-            const siteUrl = `${req.protocol}://${req.get('host')}`;
+            const siteUrl = req.protocol + '://' + req.get('host');
             const inviteLink = `${siteUrl}/staff/onboard/${token}`;
 
             sendMail({
                 to: data.email,
                 subject: 'Staff Invitation',
                 html: `
-        <p>Hello ${data.first_name || ''},</p>
-        <p>You have been invited to join Sakila as a staff member.</p>
-        <p>Click the link to complete onboarding:</p>
-        <a href="${inviteLink}">${inviteLink}</a>
-        <p>This link expires in 30 days.</p>
-      `
+      <p>Hello ${data.first_name || ''},</p>
+      <p>You have been invited to join Sakila as a staff member.</p>
+      <p>Click the link to complete onboarding:</p>
+      <a href="${inviteLink}">${inviteLink}</a>
+      <p>This link expires in 30 days.</p>
+    `
             }, (mailErr, info) => {
                 if (mailErr) {
                     console.error('Email sending failed:', mailErr);
-                    return callback(mailErr);
+                    return callback(new Error(`Mail send failed: ${mailErr.message}`));
                 }
 
-                console.log(`Invite email sent to ${data.email}: ${info.messageId}`);
-                callback(null, result);
+                console.log(`Invite email sent to ${data.email}: ${info?.messageId}`);
+                return callback(null, result);
             });
+ 
         })
     },
     onboardStaff: (token, staffData, callback) => {
@@ -84,7 +84,6 @@ module.exports = {
                                         store_id: invite.store_id,
                                         password: hashedPw,
                                         is_admin: invite.is_admin,
-                                        is_manager: invite.is_manager,
                                         address_id: address.id,
                                         active: true
                                     },
