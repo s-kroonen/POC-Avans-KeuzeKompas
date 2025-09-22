@@ -39,9 +39,20 @@ function updateFilm(data, cb) {
     filmRepo.update(data, cb);
 }
 
-function deleteFilm(id, cb) {
+function deleteFilm(id, options = {}, cb) {
+  if (options.force) {
+    return filmRepo.deleteForce(id, cb);
+  }
+
+  filmRepo.countConstraints(id, (err, count) => {
+    if (err) return cb(err);
+    if (count > 0) {
+      return cb({ message: 'Film has related records', constraints: count });
+    }
     filmRepo.delete(id, cb);
+  });
 }
+
 
 
 module.exports = { getPagedFilms, getFilmDetails , getLanguages, createFilm, updateFilm, deleteFilm};

@@ -141,6 +141,73 @@ class FilmRepository {
     });
   }
 
+  static countConstraints(filmId, cb) {
+    const queries = [
+      { table: 'film_actor', column: 'film_id' },
+      { table: 'film_category', column: 'film_id' },
+      { table: 'inventory', column: 'film_id' }
+    ];
+
+    let total = 0;
+    let done = 0;
+    let hasError = false;
+
+    queries.forEach(q => {
+      db.query(
+        `SELECT COUNT(*) AS cnt FROM ${q.table} WHERE ${q.column} = ?`,
+        [filmId],
+        (err, results) => {
+          if (hasError) return;
+          if (err) {
+            hasError = true;
+            return cb(err);
+          }
+          total += results[0].cnt;
+          done++;
+          if (done === queries.length) {
+            cb(null, total);
+          }
+        }
+      );
+    });
+  }
+
+  static deleteForce(id, cb) {
+    // Delete payments linked through rentals -> inventory -> film
+    const deletePayments = `
+    DELETE p FROM payment p
+    JOIN rental r ON p.rental_id = r.rental_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    WHERE i.film_id = ?`;
+
+    const deleteRentals = `
+    DELETE r FROM rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    WHERE i.film_id = ?`;
+
+    const deleteInventory = `DELETE FROM inventory WHERE film_id=?`;
+    const deleteFilmActor = `DELETE FROM film_actor WHERE film_id=?`;
+    const deleteFilmCategory = `DELETE FROM film_category WHERE film_id=?`;
+    const deleteFilm = `DELETE FROM film WHERE film_id=?`;
+
+    db.query(deletePayments, [id], err => {
+      if (err) return cb(err);
+      db.query(deleteRentals, [id], err2 => {
+        if (err2) return cb(err2);
+        db.query(deleteInventory, [id], err3 => {
+          if (err3) return cb(err3);
+          db.query(deleteFilmActor, [id], err4 => {
+            if (err4) return cb(err4);
+            db.query(deleteFilmCategory, [id], err5 => {
+              if (err5) return cb(err5);
+              db.query(deleteFilm, [id], cb);
+            });
+          });
+        });
+      });
+    });
+  }
+
 }
 
 module.exports = FilmRepository;

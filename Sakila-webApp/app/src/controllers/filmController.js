@@ -17,15 +17,26 @@ function detail(req, res, next) {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.redirect('/films');
     console.log('Fetching details for film ID:', id);
+
     filmService.getFilmDetails(id, function (err, film) {
         if (err) return next(err);
-        if (!film) return res.status(404).render('layout', {
-            title: 'Not Found',
-            body: '<div class="container py-5"><h1>Film not found</h1></div>'
+        if (!film) {
+            return res.status(404).render('layout', {
+                title: 'Not Found',
+                body: '<div class="container py-5"><h1>Film not found</h1></div>'
+            });
+        }
+
+        // always pass these so the EJS page has predictable variables
+        res.render('films/detail', {
+            title: film.title,
+            film,
+            error: null,
+            showForceDelete: false
         });
-        res.render('films/detail', { title: film.title, film: film });
     });
 }
+
 function newForm(req, res, next) {
     filmService.getLanguages((err, languages) => {
         if (err) return next(err);
@@ -63,10 +74,27 @@ function update(req, res, next) {
 
 function remove(req, res, next) {
     const id = parseInt(req.params.id, 10);
-    filmService.deleteFilm(id, (err) => {
-        if (err) return next(err);
+    const force = req.body.force === 'true';
+
+    filmService.deleteFilm(id, { force }, (err) => {
+        if (err) {
+            if (err.constraints) {
+                // Render detail page with error + force option
+                return filmService.getFilmDetails(id, (e2, film) => {
+                    if (e2) return next(e2);
+                    res.render('films/detail', {
+                        title: film.title,
+                        film,
+                        error: `This film is referenced in ${err.constraints} other records.`,
+                        showForceDelete: true
+                    });
+                });
+            }
+            return next(err);
+        }
         res.redirect('/films');
     });
 }
+
 
 module.exports = { list, detail, newForm, create, editForm, update, remove };

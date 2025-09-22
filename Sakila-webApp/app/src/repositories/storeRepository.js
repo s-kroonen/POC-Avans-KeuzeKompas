@@ -45,7 +45,7 @@ class StoreRepository {
     });
   }
   static isManager(staffId, callback) {
-    db.query('SELECT * FROM stores WHERE manager_staff_id = ?', [staffId], (err, results) => {
+    db.query('SELECT * FROM store WHERE manager_staff_id = ?', [staffId], (err, results) => {
       if (err) return callback(err);
       callback(null, results.length > 0);
     });

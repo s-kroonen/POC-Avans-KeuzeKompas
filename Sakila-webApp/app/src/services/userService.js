@@ -31,7 +31,7 @@ module.exports = {
                     return callback(new Error('Country not found'));
                 }
                 // Find or create city
-                cityRepo.create({ city: data.city, country_id: country.country_id }, (err, city) => {
+                cityRepo.create({ city: data.city, country_id: country.id }, (err, city) => {
                     if (err || !city) {
                         console.error('City error:', err);
                         return callback(new Error('City not found or created'));
@@ -43,7 +43,7 @@ module.exports = {
                             district: data.district,
                             postal_code: data.postal_code,
                             phone: data.phone,
-                            city_id: city.city_id
+                            city_id: city.id
                         },
                         (err, address) => {
                             if (err || !address) {
@@ -63,7 +63,7 @@ module.exports = {
                                     password: hashed,
                                     first_name: data.first_name,
                                     last_name: data.last_name,
-                                    address_id: address.address_id
+                                    address_id: address.id
                                 },
                                     (err, result) => {
                                         if (err) {

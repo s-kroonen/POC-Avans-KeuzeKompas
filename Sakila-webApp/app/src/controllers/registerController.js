@@ -24,7 +24,7 @@ module.exports = {
       if (err) {
         console.error('Register failed:', err);
         countryRepo.getAll((err2, countries) => {
-          res.render('register', { error: err.message, countries: countries || [] });
+          res.render('register', { error: err.message, countries: countries || [] , stores: []});
         });
         return;
       }

@@ -348,15 +348,23 @@ describe('filmController', () => {
   });
 
   test('detail renders film detail', done => {
-    filmService.getFilmDetails.mockImplementation((id, cb) => cb(null, { film_id: 1, title: 'Film 1' }));
+    filmService.getFilmDetails.mockImplementation((id, cb) =>
+      cb(null, { film_id: 1, title: 'Film 1' })
+    );
     const req = { params: { id: '1' } };
     const res = { render: jest.fn() };
     filmController.detail(req, res, () => { });
     setImmediate(() => {
-      expect(res.render).toHaveBeenCalledWith('films/detail', { title: 'Film 1', film: { film_id: 1, title: 'Film 1' } });
+      expect(res.render).toHaveBeenCalledWith('films/detail', {
+        title: 'Film 1',
+        film: { film_id: 1, title: 'Film 1' },
+        error: null,
+        showForceDelete: false
+      });
       done();
     });
   });
+
 
   test('detail handles not found', done => {
     filmService.getFilmDetails.mockImplementation((id, cb) => cb(null, null));

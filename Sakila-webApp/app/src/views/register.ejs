@@ -58,7 +58,7 @@
       <select class="form-select" id="store_id" name="store_id" required>
         <option value="">Select Store</option>
         <% stores.forEach(function(store) { %>
-          <option value="<%= store.store_id %>">Store <%= store.store_id %></option>
+          <option value="<%= store.id %>">Store <%= store.id %></option>
         <% }) %>
       </select>
     </div>
