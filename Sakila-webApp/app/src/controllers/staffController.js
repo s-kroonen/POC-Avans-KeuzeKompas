@@ -17,7 +17,7 @@ module.exports = {
     staffService.inviteStaff({ email, store_id, is_admin }, req, (err) => {
       if (err) {
         console.error('Error inviting staff:', err);
-        return res.render('staff/invite', { error: err.message });
+        return res.render('staff/invite', { error: err.message , stores: []});
       }
       res.redirect('/staff/invite?success=1');
     });
